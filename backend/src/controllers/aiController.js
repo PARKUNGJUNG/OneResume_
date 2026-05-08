@@ -1,4 +1,5 @@
 const axios = require("axios");
+const prisma = require("../config/prisma");
 
 exports.auditResumeContent = async (req, res) => {
   try {
@@ -65,6 +66,111 @@ exports.auditResumeContent = async (req, res) => {
     res.status(500).json({ 
       message: "AI 분석 중 오류가 발생했습니다.",
       error: error.response?.data?.error?.message || error.message 
+    });
+  }
+};
+
+// [신규] 채용 공고(JD) 매칭 및 점수화 API
+exports.matchJD = async (req, res) => {
+  try {
+    const { jdText } = req.body;
+    const userId = req.user.id;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!jdText || jdText.trim().length < 10) {
+      return res.status(400).json({ message: "분석을 위해 공고 URL 또는 내용을 입력해 주세요." });
+    }
+
+    // 1. 유저의 마스터 이력서 데이터 조회
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        resumes: {
+          take: 1,
+          orderBy: { updatedAt: 'desc' },
+          include: {
+            projects: true,
+            workExperiences: true,
+            certifications: true
+          }
+        }
+      }
+    });
+
+    if (!user || !user.resumes || user.resumes.length === 0) {
+      return res.status(404).json({ message: "분석할 이력서 데이터가 없습니다. 먼저 이력서를 작성해 주세요." });
+    }
+
+    const resume = user.resumes[0];
+
+    // 2. 이력서 데이터를 텍스트로 직렬화
+    const resumeText = `
+      [이름/기본정보]: ${user.username}, ${user.bio || "없음"}
+      [학력]: ${resume.education || "없음"}
+      [보유 기술]: ${resume.skills || "없음"}
+      [경력 사항]: ${resume.workExperiences.map(w => `${w.companyName} (${w.role}, ${w.period}): ${w.jobDescription}`).join("\n")}
+      [프로젝트]: ${resume.projects.map(p => `${p.name} (${p.role}): ${p.description} (기술: ${p.techStack})`).join("\n")}
+      [자격증/수상]: ${resume.certifications.map(c => `${c.name} (${c.issuer}, ${c.date})`).join("\n")}
+      [자기소개]: ${resume.selfIntroGrowth || ""} ${resume.selfIntroCharacter || ""} ${resume.selfIntroMotivation || ""}
+    `;
+
+    // 3. Gemini 프롬프트 구성 (URL 대응 강화)
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+
+    const prompt = `
+      당신은 기업의 채용 담당자이자 AI 매칭 전문가입니다. 
+      사용자의 [이력서]와 제공된 [채용 정보]를 비교 분석하여 정밀한 리포트를 작성하세요.
+
+      [채용 정보 (텍스트 또는 URL)]:
+      "${jdText}"
+
+      [사용자 이력서]:
+      "${resumeText}"
+
+      [분석 가이드라인]:
+      1. 입력된 내용이 URL인 경우, 해당 플랫폼(사람인, 잡코리아, 원티드 등)과 주소의 구조를 바탕으로 기업명과 직무를 유추하여 당신의 지식 내에서 분석을 시도하세요.
+      2. 만약 제공된 정보가 너무 부족하여 분석이 불가능하다면, improvementTips에 "텍스트로 전체 내용을 붙여넣어 달라"는 안내를 포함시키고 점수는 0점으로 주세요.
+      3. score: 0점에서 100점 사이의 숫자로 매칭 점수를 산출하세요. JD의 필수 역량과 이력서의 경험이 얼마나 일치하는지가 기준입니다.
+      4. coreCompetencies: JD에서 요구하는 핵심 역량 및 기술 스택 3~5개를 추출하세요.
+      5. matchedKeywords: 사용자의 이력서에서 JD와 일치하거나 관련 있는 키워드/경험을 추출하세요.
+      6. missingKeywords: JD에는 있으나 사용자의 이력서에는 부족하거나 보완이 필요한 키워드/역량을 추출하세요.
+      7. improvementTips: 이 공고에 합격하기 위해 이력서의 어느 부분을 어떻게 수정하면 좋을지 구체적인 조언을 3개 이상 제공하세요.
+
+      [답변 형식 (반드시 JSON으로만 답변하세요)]:
+      {
+        "score": 85,
+        "coreCompetencies": ["React", "TypeScript", "상태 관리 라이브러리 경험"],
+        "matchedKeywords": ["React 숙련도", "포트폴리오 프로젝트 경험"],
+        "missingKeywords": ["Next.js", "CI/CD 파이프라인 구축 경험"],
+        "improvementTips": [
+          "프로젝트 경험 섹션에 Next.js 사용 여부를 구체적으로 명시하세요.",
+          "경력 사항에서 협업 도구(Jira, Confluence) 활용 사례를 추가하면 좋습니다.",
+          "자기소개서 지원동기에 해당 기업의 비즈니스 모델에 대한 이해도를 녹여내세요."
+        ]
+      }
+    `;
+
+    const response = await axios.post(apiUrl, {
+      contents: [{
+        parts: [{ text: prompt }]
+      }]
+    });
+
+    const responseText = response.data.candidates[0].content.parts[0].text;
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    
+    if (!jsonMatch) {
+      throw new Error("AI 분석 결과 형식이 올바르지 않습니다.");
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+    res.json(result);
+
+  } catch (error) {
+    console.error("JD Matching Error:", error.message);
+    res.status(500).json({ 
+      message: "AI 매칭 분석 중 오류가 발생했습니다.",
+      error: error.message 
     });
   }
 };

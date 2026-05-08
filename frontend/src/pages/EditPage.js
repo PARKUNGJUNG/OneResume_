@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import useResume from "../hooks/useResume";
 import PageLayout from "../components/PageLayout";
 import ThemeToggle from "../components/ThemeToggle";
+import JDMatchModal from "../components/JDMatchModal";
 
 function EditPage({ isDarkMode, toggleDarkMode }) {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const [isResizing, setIsResizing] = useState(false);
   const [focusedPage, setFocusedPage] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
+  const [isJDModalOpen, setIsJDModalOpen] = useState(false);
   const [windowSize, setWindowSize] = useState({ 
     width: window.innerWidth, 
     height: window.innerHeight 
@@ -157,6 +159,15 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         <div className="flex items-center gap-3">
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
           <button 
+            onClick={() => setIsJDModalOpen(true)} 
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 h-9 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+          >
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-white">
+              <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+            </svg>
+            AI 공고 매칭
+          </button>
+          <button 
             onClick={copyShareLink} 
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 h-9 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-blue-600/20 transition-all active:scale-95"
           >
@@ -256,6 +267,12 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
       </main>
 
       <div className="hidden print:block bg-white relative"><ResumePreview formData={formData} isDarkMode={false} printMode={true} /></div>
+
+      <JDMatchModal 
+        isOpen={isJDModalOpen} 
+        onClose={() => setIsJDModalOpen(false)} 
+        isDarkMode={isDarkMode} 
+      />
     </PageLayout>
   );
 }
