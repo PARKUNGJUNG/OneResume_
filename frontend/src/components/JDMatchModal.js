@@ -61,6 +61,14 @@ function JDMatchModal({ isOpen, onClose, isDarkMode }) {
       <div className={`relative w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-[32px] shadow-2xl flex flex-col lg:flex-row animate-in fade-in zoom-in duration-300 ${
         isDarkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white'
       }`}>
+        {/* PC용 고정 닫기 버튼 (스크롤 영역 밖) */}
+        <button 
+          onClick={onClose} 
+          className="hidden lg:flex absolute top-6 right-6 w-10 h-10 rounded-full items-center justify-center hover:bg-zinc-500/10 transition-colors z-50"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+
         {/* 좌측: JD 입력 (모바일에서는 상단) */}
         <div className={`w-full lg:w-[45%] p-6 sm:p-8 flex flex-col border-b lg:border-b-0 lg:border-r ${
           isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-gray-50 border-zinc-200'
@@ -107,14 +115,6 @@ function JDMatchModal({ isOpen, onClose, isDarkMode }) {
         <div className={`w-full lg:w-[55%] overflow-y-auto custom-scrollbar p-6 sm:p-8 relative ${
           isDarkMode ? 'bg-[#09090b]' : 'bg-white'
         }`}>
-          {/* PC용 닫기 버튼 */}
-          <button 
-            onClick={onClose} 
-            className="hidden lg:flex absolute top-6 right-6 w-10 h-10 rounded-full items-center justify-center hover:bg-zinc-500/10 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-
           {!result && !loading && (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-40 min-h-[300px]">
               <div className="w-20 h-20 bg-zinc-500/20 rounded-full flex items-center justify-center mb-4">

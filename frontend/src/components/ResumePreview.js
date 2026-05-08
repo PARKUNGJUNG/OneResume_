@@ -418,25 +418,6 @@ const ResumePreview = React.memo(React.forwardRef((props, ref) => {
       currentPageNum++;
     }
 
-    // 마무리 인사 페이지 추가
-    pagesList.push({ id: currentPageNum, content: (
-      <div className="flex flex-col h-full items-center justify-center text-center">
-        <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-white mb-8 shadow-2xl">
-          <span className="text-4xl font-black">O</span>
-        </div>
-        <h3 className={`text-3xl font-black mb-4 ${theme.name}`}>감사합니다!</h3>
-        <p className={`text-lg mb-10 ${theme.bio}`}>제 이력서를 끝까지 봐주셔서 감사합니다.</p>
-        <div className={`p-8 border-2 border-dashed rounded-[40px] ${theme.boxBg}`}>
-          <p className="text-sm font-bold uppercase tracking-widest mb-4 opacity-50">연락처 정보</p>
-          <p className={`text-2xl font-black mb-2 ${theme.textMain}`}>{formData.email}</p>
-          {formData.blogUrl && (
-            <a href={formData.blogUrl} target="_blank" rel="noopener noreferrer" onClick={handleLinkClick} className={`text-lg font-bold hover:underline ${theme.link}`}>{formData.blogUrl}</a>
-          )}
-        </div>
-        <div className="absolute bottom-4 right-8 text-[10px] opacity-30 font-bold tracking-tighter italic">마지막 페이지</div>
-      </div>
-    )});
-
     return pagesList;
   }, [formData, githubUsername, theme, getItemHeight, renderItem, header, handleLinkClick]);
 

@@ -17,6 +17,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const [focusedPage, setFocusedPage] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [isJDModalOpen, setIsJDModalOpen] = useState(false);
+  const [isLayoutOpen, setIsLayoutOpen] = useState(false);
   const [windowSize, setWindowSize] = useState({ 
     width: window.innerWidth, 
     height: window.innerHeight 
@@ -147,9 +148,9 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   };
 
   const baseScale = getScale();
-  // 리사이징 중에도 아주 짧은 transition을 주어 툭툭 끊김 방지
+  // 리사이징 중에는 트랜지션을 완전히 제거하여 마우스 포인터를 즉각 따라오게 함
   const transitionClass = isResizing 
-    ? "transition-all duration-75 ease-linear" 
+    ? "transition-none" 
     : "transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]";
 
   return (
@@ -216,6 +217,58 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
               isDarkMode={isDarkMode} paneWidth={leftPanePixelWidth}
             />
           </div>
+
+          {/* 레이아웃 플로팅 버튼 (FAB) */}
+          <button 
+            onClick={() => setIsLayoutOpen(!isLayoutOpen)}
+            className={`fixed bottom-8 z-[60] w-14 h-14 rounded-2xl shadow-2xl flex items-center justify-center transition-all duration-500 active:scale-90 border-2 ${
+              isResizing ? 'transition-none' : 'transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]'
+            } ${
+              isLayoutOpen 
+                ? (isDarkMode ? 'bg-blue-600 border-blue-500 text-white' : 'bg-zinc-900 border-zinc-700 text-white')
+                : (isDarkMode ? 'bg-zinc-800 border-zinc-700 text-blue-400 hover:border-blue-500' : 'bg-white border-blue-100 text-blue-600 hover:border-blue-500')
+            }`}
+            style={{ left: `calc(${leftWidth}% - 80px)` }}
+          >
+            {isLayoutOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-in spin-in-90 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 11a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2zM4 17a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2z" /></svg>
+            )}
+          </button>
+
+          {/* 레이아웃 설정 사이드 패널 */}
+          {isLayoutOpen && (
+            <div 
+              className={`fixed bottom-24 z-[60] w-80 p-6 rounded-[32px] shadow-2xl border-2 animate-in slide-in-from-bottom-8 fade-in zoom-in-95 duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+                isResizing ? 'transition-none' : 'transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]'
+              } ${
+                isDarkMode ? 'bg-zinc-900 border-zinc-700 shadow-blue-900/20' : 'bg-white border-blue-50'
+              }`}
+              style={{ left: `calc(${leftWidth}% - 340px)` }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-1.5 h-5 bg-blue-600 rounded-full shadow-lg shadow-blue-500/50" />
+                <h4 className={`font-black text-sm uppercase tracking-wider ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>섹션 순서 배치</h4>
+              </div>
+              
+              <div className="space-y-2">
+                <div className={`p-4 rounded-2xl border-2 border-dashed mb-4 ${isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-gray-50 border-gray-200'}`}>
+                  <p className={`text-[11px] font-bold leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                    드래그하여 섹션 순서를 바꾸면<br/>오른쪽 미리보기에 즉시 반영됩니다.
+                  </p>
+                </div>
+
+                <div className="custom-scrollbar max-h-[400px] overflow-y-auto pr-1">
+                  <ResumeForm
+                    formData={formData} handleDragEnd={handleDragEndWithState}
+                    onDragStart={handleDragStart} isDarkMode={isDarkMode}
+                    onlyLayout={true} // 레이아웃 모드 전용 플래그
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div onMouseDown={startResizing} className="relative w-1 cursor-col-resize z-50 flex-shrink-0 group"><div className="absolute inset-y-0 -left-1 -right-1 group-hover:bg-blue-500/30 transition-colors" /></div>
@@ -243,7 +296,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                 </button>
               </div>
 
-              <div className="pointer-events-auto flex items-center gap-4 bg-black/60 backdrop-blur-2xl px-6 py-3 rounded-[24px] border border-white/10 shadow-2xl mb-4">
+              <div className="pointer-events-auto flex items-center gap-4 bg-black/60 backdrop-blur-2xl px-6 py-3 rounded-[24px] border border-white/10 shadow-2xl mb-4 transition-all duration-500 opacity-0 translate-y-4 hover:opacity-100 hover:translate-y-0 group/controls">
                 <button onClick={() => setFocusedPage(null)} className="flex items-center gap-2 text-white font-black text-xs pr-4 border-r border-white/20 hover:text-blue-400 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                   전체 보기
@@ -255,7 +308,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
             </div>
           )}
 
-          <div className={`w-full h-full flex justify-center items-start ${focusedPage ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
+          <div className={`w-full h-full flex justify-center items-start custom-scrollbar ${focusedPage ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
             <div 
               className={`${transitionClass} transform-gpu flex items-center justify-center shrink-0 ${isDragging ? 'opacity-30 grayscale' : 'opacity-100'}`} 
               style={{ transform: `scale(${baseScale})`, transformOrigin: 'top center', marginTop: '40px', marginBottom: '80px' }}
