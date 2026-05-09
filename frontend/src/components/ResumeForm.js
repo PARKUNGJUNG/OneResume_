@@ -153,6 +153,82 @@ const ResumeForm = ({
     target.style.height = target.scrollHeight + 'px';
   };
 
+  // --- 연/월 선택 컴포넌트 ---
+  const YearMonthPicker = ({ value, onChange, isDarkMode, placeholder = "선택" }) => {
+    const [year, month] = (value || "").split(".");
+    
+    const years = [];
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear + 5; y >= 1970; y--) years.push(y);
+    
+    const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+
+    // 다른 입력창(py-3, text-[14px])과 높이 및 폰트 크기 동기화
+    const selectClass = `px-4 py-3 rounded-xl border outline-none transition-all appearance-none cursor-pointer text-[14px] font-bold ${
+      isDarkMode ? "bg-zinc-900 border-zinc-700 text-zinc-100 focus:border-blue-500" : "bg-white border-gray-200 text-zinc-900 focus:border-blue-500"
+    }`;
+
+    return (
+      <div className="flex gap-2 items-center w-full">
+        {/* 연도와 월의 비율을 1:1로 설정하여 균등하게 배치 */}
+        <div className="relative flex-1">
+          <select 
+            value={year || ""} 
+            onChange={(e) => onChange(`${e.target.value}.${month || '01'}`)} 
+            className={`${selectClass} w-full pr-8`}
+          >
+            <option value="" disabled>{placeholder}</option>
+            {years.map(y => <option key={y} value={y}>{y}년</option>)}
+          </select>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M19 9l-7 7-7-7" /></svg>
+          </div>
+        </div>
+        <div className="relative flex-1">
+          <select 
+            value={month || ""} 
+            onChange={(e) => onChange(`${year || currentYear}.${e.target.value}`)} 
+            className={`${selectClass} w-full pr-8`}
+          >
+            <option value="" disabled>월</option>
+            {months.map(m => <option key={m} value={m}>{m}월</option>)}
+          </select>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M19 9l-7 7-7-7" /></svg>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const PeriodPicker = ({ value, onChange, isDarkMode, isCurrent }) => {
+    const [start, end] = (value || "").split(" ~ ");
+    
+    const handleStartChange = (newStart) => {
+      onChange(`${newStart}${!isCurrent && end ? ` ~ ${end}` : ''}`);
+    };
+
+    const handleEndChange = (newEnd) => {
+      onChange(`${start || ''} ~ ${newEnd}`);
+    };
+
+    return (
+      <div className={`flex flex-col sm:flex-row gap-3 ${isCurrent ? '' : 'sm:items-center'}`}>
+        <div className="flex-1 w-full">
+          <YearMonthPicker value={start} onChange={handleStartChange} isDarkMode={isDarkMode} placeholder="시작년도" />
+        </div>
+        {!isCurrent && (
+          <>
+            <div className="hidden sm:block text-zinc-400 font-bold px-1">~</div>
+            <div className="flex-1 w-full">
+              <YearMonthPicker value={end} onChange={handleEndChange} isDarkMode={isDarkMode} placeholder="종료년도" />
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
   React.useEffect(() => {
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(ta => {
@@ -354,21 +430,63 @@ const ResumeForm = ({
                   </div>
                   <div className={`p-6 lg:p-8 rounded-[32px] border ${theme.cardBg} space-y-5`}>
                     <div className="flex items-center gap-2 mb-2"><div className="w-1.5 h-4 bg-blue-600 rounded-full" /><label className={`text-[13px] font-black uppercase tracking-widest ${theme.labelText}`}>병역 사항</label></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="flex flex-col gap-2"><label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>군필 여부</label><select name="militaryStatus" value={formData.militaryStatus || ""} onChange={handleChange} className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg} font-bold`}><option value="">선택 안함</option><option value="군필">군필</option><option value="복무중">복무중</option><option value="미필">미필</option><option value="면제">면제</option><option value="해당없음">해당없음</option></select></div>
+                    
+                    {/* 상단 섹션: 상태에 따라 1~3열 유동적 배치 */}
+                    <div className={`grid grid-cols-1 gap-5 ${
+                      !['미필', '해당없음', '면제', ''].includes(formData.militaryStatus) ? 'md:grid-cols-3' : 
+                      (formData.militaryStatus === '면제' ? 'md:grid-cols-2' : 'md:grid-cols-1')
+                    }`}>
+                      <div className="flex flex-col gap-2">
+                        <label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>군필 여부</label>
+                        <select name="militaryStatus" value={formData.militaryStatus || ""} onChange={handleChange} className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg} font-bold`}>
+                          <option value="">선택 안함</option>
+                          <option value="군필">군필</option>
+                          <option value="복무중">복무중</option>
+                          <option value="미필">미필</option>
+                          <option value="면제">면제</option>
+                          <option value="해당없음">해당없음</option>
+                        </select>
+                      </div>
+
                       {formData.militaryStatus === '면제' && (
-                        <div className="flex flex-col gap-2"><label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>면제 사유</label><input type="text" name="militaryExemption" value={formData.militaryExemption || ""} onChange={handleChange} placeholder="면제 사유를 간단히 입력" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} /></div>
+                        <div className="flex flex-col gap-2">
+                          <label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>면제 사유</label>
+                          <input type="text" name="militaryExemption" value={formData.militaryExemption || ""} onChange={handleChange} placeholder="면제 사유를 간단히 입력" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} />
+                        </div>
+                      )}
+
+                      {!['미필', '해당없음', '면제', ''].includes(formData.militaryStatus) && (
+                        <>
+                          <div className="flex flex-col gap-2">
+                            <label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>군별</label>
+                            <input type="text" name="militaryBranch" value={formData.militaryBranch || ""} onChange={handleChange} placeholder="육군" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} />
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>계급</label>
+                            <input type="text" name="militaryRank" value={formData.militaryRank || ""} onChange={handleChange} placeholder="병장" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} />
+                          </div>
+                        </>
                       )}
                     </div>
+
+                    {/* 하단 섹션: 복무 기간 (넓게 2열 배치) */}
                     {!['미필', '해당없음', '면제', ''].includes(formData.militaryStatus) && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-2"><label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>군별</label><input type="text" name="militaryBranch" value={formData.militaryBranch || ""} onChange={handleChange} placeholder="육군" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} /></div>
-                          <div className="flex flex-col gap-2"><label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>계급</label><input type="text" name="militaryRank" value={formData.militaryRank || ""} onChange={handleChange} placeholder="병장" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} /></div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-zinc-500/10 mt-5">
+                        <div className="flex flex-col gap-2">
+                          <label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>입대년월</label>
+                          <YearMonthPicker 
+                            value={formData.militaryStartDate || ""} 
+                            onChange={(val) => handleChange({ target: { name: 'militaryStartDate', value: val } })} 
+                            isDarkMode={isDarkMode} 
+                          />
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-2"><label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>입대년월</label><input type="text" name="militaryStartDate" value={formData.militaryStartDate || ""} onChange={handleChange} placeholder="YYYY.MM" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} /></div>
-                          <div className="flex flex-col gap-2"><label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>전역년월</label><input type="text" name="militaryEndDate" value={formData.militaryEndDate || ""} onChange={handleChange} placeholder="YYYY.MM" className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${theme.innerInputBg}`} /></div>
+                        <div className="flex flex-col gap-2">
+                          <label className={`pl-1 text-[11px] font-black uppercase ${theme.subText}`}>전역년월</label>
+                          <YearMonthPicker 
+                            value={formData.militaryEndDate || ""} 
+                            onChange={(val) => handleChange({ target: { name: 'militaryEndDate', value: val } })} 
+                            isDarkMode={isDarkMode} 
+                          />
                         </div>
                       </div>
                     )}
@@ -461,7 +579,15 @@ const ResumeForm = ({
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>기간</label><input type="text" name="period" value={work.period || ""} onChange={(e) => handleWorkChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg}`} /></div>
+                      <div className="flex flex-col gap-2">
+                        <label className={`text-[11px] font-black uppercase ${theme.subText}`}>기간</label>
+                        <PeriodPicker 
+                          value={work.period || ""} 
+                          onChange={(val) => handleWorkChange(index, { target: { name: 'period', value: val } })} 
+                          isDarkMode={isDarkMode} 
+                          isCurrent={work.isCurrent}
+                        />
+                      </div>
                       <div className="flex flex-col gap-2"><div className="flex justify-between"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>업무 내용</label><button type="button" onClick={() => handleAiAudit(`work-${index}`, work.jobDescription)} className="text-[10px] text-blue-600 font-black hover:underline">AI 첨삭</button></div><textarea name="jobDescription" value={work.jobDescription || ""} onChange={(e) => handleWorkChange(index, e)} onInput={autoExpand} rows="4" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} resize-none leading-relaxed text-[13px] min-h-[100px] overflow-hidden`} /></div>
                     </div>
                   ))}
@@ -472,15 +598,22 @@ const ResumeForm = ({
             {activeTab === 'certs' && (
               <div className="space-y-6 animate-fade-in">
                 <div className={`p-5 rounded-[24px] border ${theme.cardBg} flex items-center justify-between shadow-sm`}><h4 className={`text-[14px] font-black ${theme.titleText}`}>자격 / 수상 ({formData.certifications.length})</h4><button type="button" onClick={addCert} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-black shadow-lg transition-all active:scale-95">+ 추가</button></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {formData.certifications.map((cert, index) => (
-                    <div key={index} className={`p-6 rounded-[28px] border ${theme.cardBg} relative group space-y-4 transition-all hover:border-blue-500/30`}><button type="button" onClick={() => removeCert(index)} className="absolute -right-2 -top-2 w-8 h-8 bg-red-500 text-white rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all font-bold shadow-lg z-10">✕</button>
-                      <div className="flex flex-col gap-1.5"><label className={`text-[10px] font-black uppercase ${theme.subText}`}>명칭</label><input type="text" name="name" value={cert.name || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-4 py-2.5 rounded-lg border ${theme.innerInputBg} text-[13px] font-bold`} /></div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1.5"><label className={`text-[10px] font-black uppercase ${theme.subText}`}>발급기관</label><input type="text" name="issuer" value={cert.issuer || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-4 py-2.5 rounded-lg border ${theme.innerInputBg} text-[13px]`} /></div>
-                        <div className="flex flex-col gap-1.5"><label className={`text-[10px] font-black uppercase ${theme.subText}`}>취득일</label><input type="text" name="date" value={cert.date || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-4 py-2.5 rounded-lg border ${theme.innerInputBg} text-[13px]`} /></div>
+                    <div key={index} className={`p-6 lg:p-8 rounded-[32px] border ${theme.cardBg} relative group space-y-5 transition-all hover:border-blue-500/30`}><button type="button" onClick={() => removeCert(index)} className="absolute -right-2 -top-2 w-9 h-9 bg-red-500 text-white rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all font-bold shadow-xl z-10">✕</button>
+                      <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>명칭</label><input type="text" name="name" value={cert.name || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} text-[14px] font-bold`} /></div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>발급기관</label><input type="text" name="issuer" value={cert.issuer || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} text-[14px]`} /></div>
+                        <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>점수 / 등급</label><input type="text" name="score" value={cert.score || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} text-[14px]`} /></div>
                       </div>
-                      <div className="flex flex-col gap-1.5"><label className={`text-[10px] font-black uppercase ${theme.subText}`}>점수/등급</label><input type="text" name="score" value={cert.score || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-4 py-2.5 rounded-lg border ${theme.innerInputBg} text-[13px]`} /></div>
+                      <div className="flex flex-col gap-2">
+                        <label className={`text-[11px] font-black uppercase ${theme.subText}`}>취득일</label>
+                        <YearMonthPicker 
+                          value={cert.date || ""} 
+                          onChange={(val) => handleCertChange(index, { target: { name: 'date', value: val } })} 
+                          isDarkMode={isDarkMode} 
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -490,23 +623,66 @@ const ResumeForm = ({
             {activeTab === 'projects' && (
               <div className="space-y-6 animate-fade-in">
                 <div className={`p-5 rounded-[24px] border ${theme.cardBg} flex items-center justify-between shadow-sm`}><h4 className={`text-[14px] font-black ${theme.titleText}`}>프로젝트 ({formData.projects.length})</h4><button type="button" onClick={addProject} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-black shadow-lg transition-all active:scale-95">+ 추가</button></div>
-                <Droppable droppableId="projects">{(provided) => (<div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {formData.projects.map((project, index) => (
-                    <Draggable key={project.id} draggableId={String(project.id)} index={index}>{(provided, snapshot) => (
-                      <div ref={provided.innerRef} {...provided.draggableProps} style={provided.draggableProps.style} className={`p-6 lg:p-8 rounded-[32px] border transition-[background-color,border-color,box-shadow] duration-200 ${snapshot.isDragging ? 'shadow-xl border-blue-500 bg-white dark:bg-zinc-800 z-[100]' : theme.cardBg} relative group`}><div {...provided.dragHandleProps} className="absolute left-1/2 -translate-x-1/2 top-3 w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full cursor-grab active:cursor-grabbing hover:bg-blue-400 transition-colors" />
-                        <div className="space-y-5 mt-4">
-                          <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>프로젝트명</label><input type="text" name="name" value={project.name || ""} onChange={(e) => handleProjectChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} font-black`} /></div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>기간</label><input type="text" name="period" value={project.period || ""} onChange={(e) => handleProjectChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg}`} /></div>
-                            <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>담당 역할</label><input type="text" name="role" value={project.role || ""} onChange={(e) => handleProjectChange(index, e)} autoComplete="off" placeholder="예: 인증 모듈 설계 및 API 개발" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg}`} /></div>
+                
+                {/* 그리드를 제거하고 세로 리스트 형태로 변경 (DND 최적화) */}
+                <Droppable droppableId="projects">{(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-6">
+                    {formData.projects.map((project, index) => (
+                      <Draggable key={project.id} draggableId={String(project.id)} index={index}>{(provided, snapshot) => (
+                        <div 
+                          ref={provided.innerRef} 
+                          {...provided.draggableProps} 
+                          style={provided.draggableProps.style} 
+                          className={`p-6 lg:p-8 rounded-[32px] border transition-all duration-200 ${
+                            snapshot.isDragging 
+                              ? 'shadow-2xl border-blue-500 bg-white dark:bg-zinc-800 z-[100] scale-[1.02]' 
+                              : theme.cardBg
+                          } relative group shadow-sm`}
+                        >
+                          <button type="button" onClick={() => removeProject(index)} className="absolute -right-2 -top-2 w-9 h-9 bg-red-500 text-white rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all font-bold shadow-xl z-50">✕</button>
+                          <div {...provided.dragHandleProps} className="absolute left-1/2 -translate-x-1/2 top-3 w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full cursor-grab active:cursor-grabbing hover:bg-blue-400 transition-colors" />
+                          
+                          <div className="space-y-6 mt-4">
+                            <div className="flex flex-col gap-2">
+                              <label className={`text-[11px] font-black uppercase ${theme.subText}`}>프로젝트명</label>
+                              <input type="text" name="name" value={project.name || ""} onChange={(e) => handleProjectChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} font-black text-lg`} />
+                            </div>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                              <div className="flex flex-col gap-2">
+                                <label className={`text-[11px] font-black uppercase ${theme.subText}`}>담당 역할</label>
+                                <input type="text" name="role" value={project.role || ""} onChange={(e) => handleProjectChange(index, e)} autoComplete="off" placeholder="예: 프론트엔드 개발" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg}`} />
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <label className={`text-[11px] font-black uppercase ${theme.subText}`}>기술 스택</label>
+                                <input type="text" name="techStack" value={project.techStack || ""} onChange={(e) => handleProjectChange(index, e)} placeholder="예: React, Node.js" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg}`} />
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                              <label className={`text-[11px] font-black uppercase ${theme.subText}`}>진행 기간</label>
+                              <PeriodPicker 
+                                value={project.period || ""} 
+                                onChange={(val) => handleProjectChange(index, { target: { name: 'period', value: val } })} 
+                                isDarkMode={isDarkMode} 
+                              />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                              <div className="flex justify-between items-center">
+                                <label className={`text-[11px] font-black uppercase ${theme.subText}`}>상세 성과</label>
+                                <button type="button" onClick={() => handleAiAudit("project-" + index, project.description)} className="text-[10px] text-blue-600 font-black hover:underline px-2 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg">AI 분석 리포트</button>
+                              </div>
+                              <textarea name="description" value={project.description || ""} onChange={(e) => handleProjectChange(index, e)} onInput={autoExpand} rows="4" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} resize-none leading-relaxed text-[14px] min-h-[120px] overflow-hidden`} />
+                            </div>
                           </div>
-                          <div className="flex flex-col gap-2"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>기술 스택</label><input type="text" name="techStack" value={project.techStack || ""} onChange={(e) => handleProjectChange(index, e)} className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg}`} /></div>
-                          <div className="flex flex-col gap-2"><div className="flex justify-between items-center"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>상세 성과</label><button type="button" onClick={() => handleAiAudit("project-" + index, project.description)} className="text-[10px] text-blue-600 font-black hover:underline">AI 분석</button></div><textarea name="description" value={project.description || ""} onChange={(e) => handleProjectChange(index, e)} onInput={autoExpand} rows="5" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} resize-none leading-relaxed text-[13px] min-h-[120px] overflow-hidden`} /></div>
-                          <div className="flex justify-end"><button type="button" onClick={() => removeProject(index)} className="text-red-500 text-[10px] font-black hover:underline uppercase tracking-tight">프로젝트 삭제</button></div>
                         </div>
-                      </div>)}
-                    </Draggable>))}
-                  {provided.placeholder}</div>)}</Droppable>
+                      )}
+                    </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}</Droppable>
               </div>
             )}
 
