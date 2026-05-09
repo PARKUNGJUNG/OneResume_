@@ -44,4 +44,7 @@ router.get('/user/:subdomain', resumeController.getUserBySubdomain);
 // [이력서 저장]
 router.post('/save', authMiddleware, resumeController.saveResume);
 
+// [표준 JSON 데이터 내보내기]
+router.get('/export', authMiddleware, resumeController.exportResume);
+
 module.exports = router;

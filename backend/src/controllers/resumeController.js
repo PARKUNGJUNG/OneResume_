@@ -176,6 +176,133 @@ exports.getUserBySubdomain = async (req, res) => {
 };
 
 // [3] 이력서 저장 API
+/**
+ * 표준 JSON 포맷으로 이력서 내보내기 (확장 프로그램 연동용)
+ */
+exports.exportResume = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        resumes: {
+          take: 1,
+          orderBy: { updatedAt: 'desc' },
+          include: {
+            projects: true,
+            workExperiences: true,
+            certifications: true
+          }
+        }
+      }
+    });
+
+    if (!user || !user.resumes || user.resumes.length === 0) {
+      return res.status(404).json({ message: "내보낼 이력서 데이터가 없습니다." });
+    }
+
+    const resume = user.resumes[0];
+    const eduParts = resume.education ? resume.education.split(" | ") : ["", "", ""];
+
+    // 표준 JSON Resume 스키마와 국내 채용 사이트의 공통 항목을 고려한 매핑
+    const exportedData = {
+      version: "1.1.0",
+      generatedAt: new Date().toISOString(),
+      basics: {
+        name: user.username,
+        label: user.bio,
+        email: user.email,
+        phone: user.phone,
+        url: `https://${user.subdomain}.oneresume.kr`,
+        summary: resume.bio || "",
+        location: {
+          address: user.address,
+          addressDetail: user.addressDetail,
+        },
+        profiles: [
+          { network: "GitHub", url: user.githubUrl },
+          { network: "Blog", url: user.blogUrl }
+        ],
+        personalInfo: {
+          age: user.age,
+          gender: user.gender,
+          military: {
+            status: resume.militaryStatus,
+            branch: resume.militaryBranch,
+            rank: resume.militaryRank,
+            startDate: resume.militaryStartDate,
+            endDate: resume.militaryEndDate,
+            exemptionReason: resume.militaryExemption
+          }
+        }
+      },
+      education: [
+        {
+          institution: eduParts[0] || "",
+          area: eduParts[1] || "",
+          gpa: eduParts[2] || "",
+          studyType: "University", // 학교명 기반으로 추후 확장 가능
+          score: eduParts[2] || ""
+        }
+      ],
+      skills: resume.skills ? resume.skills.split(",").map(s => s.trim()) : [],
+      work: resume.workExperiences.map(w => ({
+        company: w.companyName,
+        position: w.position || w.role,
+        department: w.department,
+        startDate: w.period?.split(" ~ ")[0] || "",
+        endDate: w.isCurrent ? "Present" : (w.period?.split(" ~ ")[1] || ""),
+        summary: w.jobDescription,
+        highlights: []
+      })),
+      projects: resume.projects.map(p => ({
+        name: p.name,
+        description: p.description,
+        startDate: p.period?.split(" ~ ")[0] || "",
+        endDate: p.period?.split(" ~ ")[1] || "",
+        url: p.githubUrl,
+        roles: [p.role],
+        keywords: p.techStack ? p.techStack.split(",").map(k => k.trim()) : []
+      })),
+      // 자격증/어학/수상 내역 분리
+      certificates: resume.certifications
+        .filter(c => c.type === "CERT")
+        .map(c => ({
+          name: c.name,
+          date: c.date,
+          issuer: c.issuer
+        })),
+      languages: resume.certifications
+        .filter(c => c.type === "LANG")
+        .map(c => ({
+          language: c.name,
+          fluency: c.score,
+          issuer: c.issuer,
+          date: c.date
+        })),
+      awards: resume.certifications
+        .filter(c => c.type === "AWARD")
+        .map(c => ({
+          title: c.name,
+          date: c.date,
+          awarder: c.issuer,
+          summary: c.score
+        })),
+      selfIntroduction: {
+        growth: resume.selfIntroGrowth,
+        character: resume.selfIntroCharacter,
+        motivation: resume.selfIntroMotivation
+      }
+    };
+
+    res.json(exportedData);
+  } catch (error) {
+    console.error("Export Error:", error.message);
+    res.status(500).json({ message: "데이터 내보내기 중 오류가 발생했습니다." });
+  }
+};
+
 exports.saveResume = async (req, res) => {
     try {
         const userId = req.user.id; 

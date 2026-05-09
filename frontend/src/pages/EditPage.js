@@ -7,6 +7,7 @@ import useResume from "../hooks/useResume";
 import PageLayout from "../components/PageLayout";
 import ThemeToggle from "../components/ThemeToggle";
 import JDMatchModal from "../components/JDMatchModal";
+import ConnectModal from "../components/ConnectModal";
 
 function EditPage({ isDarkMode, toggleDarkMode }) {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const [focusedPage, setFocusedPage] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [isJDModalOpen, setIsJDModalOpen] = useState(false);
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [isLayoutOpen, setIsLayoutOpen] = useState(false);
   const [windowSize, setWindowSize] = useState({ 
     width: window.innerWidth, 
@@ -159,6 +161,15 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         <div className="flex items-center gap-3"><div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg font-black">O</div><h1 className={`text-base font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1></div>
         <div className="flex items-center gap-3">
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+          <button 
+            onClick={() => setIsConnectModalOpen(true)} 
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 h-9 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-purple-600/20 transition-all active:scale-95"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+            </svg>
+            확장 프로그램 연동
+          </button>
           <button 
             onClick={() => setIsJDModalOpen(true)} 
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 h-9 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
@@ -325,6 +336,11 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         isOpen={isJDModalOpen} 
         onClose={() => setIsJDModalOpen(false)} 
         isDarkMode={isDarkMode} 
+      />
+      <ConnectModal
+        isOpen={isConnectModalOpen}
+        onClose={() => setIsConnectModalOpen(false)}
+        isDarkMode={isDarkMode}
       />
     </PageLayout>
   );

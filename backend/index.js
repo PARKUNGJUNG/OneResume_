@@ -32,9 +32,11 @@ app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
     
-    // 허용 목록에 있거나 oneresume.kr의 서브도메인이거나 amazonaws.com으로 끝나는 S3 관련 도메인들 허용
+    // 허용 목록에 있거나 oneresume.kr의 서브도메인이거나 
+    // 크롬 확장 프로그램(chrome-extension://) 또는 S3/AWS 관련 도메인들 허용
     const isAllowed = allowedOrigins.some(allowed => origin === allowed) || 
                      origin.endsWith('.oneresume.kr') ||
+                     origin.startsWith('chrome-extension://') ||
                      origin.includes('s3-website') || 
                      origin.endsWith('amazonaws.com');
     
