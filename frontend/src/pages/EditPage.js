@@ -19,7 +19,29 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const [totalPages, setTotalPages] = useState(1);
   const [isJDModalOpen, setIsJDModalOpen] = useState(false);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isExtensionInstalled, setIsExtensionInstalled] = useState(false);
   const [isLayoutOpen, setIsLayoutOpen] = useState(false);
+
+  // --- 확장 프로그램 실시간 감지 로직 ---
+  useEffect(() => {
+    const handlePong = () => {
+      setIsExtensionInstalled(true);
+    };
+
+    window.addEventListener('ONERESUME_PONG', handlePong);
+
+    // 주기적으로 핑을 보내 확장 프로그램 확인
+    const pingInterval = setInterval(() => {
+      if (!isExtensionInstalled) {
+        window.dispatchEvent(new CustomEvent('ONERESUME_PING'));
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('ONERESUME_PONG', handlePong);
+      clearInterval(pingInterval);
+    };
+  }, [isExtensionInstalled]);
   const [windowSize, setWindowSize] = useState({ 
     width: window.innerWidth, 
     height: window.innerHeight 
@@ -158,7 +180,26 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   return (
     <PageLayout isDarkMode={isDarkMode} noPadding={true}>
       <header className={`h-14 px-6 border-b flex items-center justify-between z-20 print:hidden ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
-        <div className="flex items-center gap-3"><div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg font-black">O</div><h1 className={`text-base font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1></div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg font-black text-xs">O</div>
+            <h1 className={`text-base font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
+          </div>
+          
+          {isExtensionInstalled && (
+            <div className="flex items-center gap-2.5 animate-in fade-in slide-in-from-left-3 duration-700">
+              <div className={`h-3.5 w-[1.5px] rounded-full ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+                  <span className={`text-[10px] font-black uppercase tracking-wider ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                    Extension Active
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-3">
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
           <button 
@@ -341,6 +382,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         isOpen={isConnectModalOpen}
         onClose={() => setIsConnectModalOpen(false)}
         isDarkMode={isDarkMode}
+        isExtensionInstalled={isExtensionInstalled}
       />
     </PageLayout>
   );

@@ -2,41 +2,8 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { API_BASE_URL } from "../config";
 
-function ConnectModal({ isOpen, onClose, isDarkMode }) {
-  const [isExtensionInstalled, setIsExtensionInstalled] = useState(false);
+function ConnectModal({ isOpen, onClose, isDarkMode, isExtensionInstalled }) {
   const [isSyncing, setIsSyncing] = useState(false);
-
-  // --- 확장 프로그램 실시간 감지 로직 ---
-  useEffect(() => {
-    if (isOpen) {
-      console.log("🔍 [Website] Detecting extension...");
-
-      const handlePong = () => {
-        console.log("📥 [Website] PONG received from extension!");
-        setIsExtensionInstalled(true);
-      };
-
-      window.addEventListener('ONERESUME_PONG', handlePong);
-
-      // 확장 프로그램이 로드될 시간을 주거나, 놓쳤을 경우를 대비해 3번 시도
-      const pingInterval = setInterval(() => {
-        if (!isExtensionInstalled) {
-          window.dispatchEvent(new CustomEvent('ONERESUME_PING'));
-        }
-      }, 500);
-
-      // 3초 후에는 시도 중단
-      const timeout = setTimeout(() => {
-        clearInterval(pingInterval);
-      }, 3000);
-
-      return () => {
-        window.removeEventListener('ONERESUME_PONG', handlePong);
-        clearInterval(pingInterval);
-        clearTimeout(timeout);
-      };
-    }
-  }, [isOpen, isExtensionInstalled]);
 
   if (!isOpen) return null;
 
@@ -106,21 +73,39 @@ function ConnectModal({ isOpen, onClose, isDarkMode }) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
       <div className={`relative w-full max-w-lg rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-500 ${
-        isDarkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white'
+        isDarkMode ? 'bg-zinc-900 border border-white/5' : 'bg-white'
       }`}>
-        <div className="h-2 bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600" />
+        {/* 상단 앰비언트 글로우 & 그라데이션 라인 */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-purple-600/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
         
-        <div className="p-10">
-          <div className="flex justify-between items-start mb-8">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-700 rounded-[22px] flex items-center justify-center shadow-2xl shadow-purple-500/30 transform -rotate-6">
-                <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" /></svg>
+        <div className="p-10 relative z-10">
+          <div className="flex justify-between items-start mb-10">
+            <div className="flex items-center gap-5">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-[24px] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative w-16 h-16 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 rounded-[24px] flex items-center justify-center shadow-xl transition-all duration-500">
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    className="w-10 h-10 fill-none stroke-white" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="4" className="fill-white" />
+                    <line x1="21.17" y1="8" x2="12" y2="8" />
+                    <line x1="3.95" y1="6.06" x2="8.54" y2="12" />
+                    <line x1="10.88" y1="21.94" x2="15.46" y2="12" />
+                  </svg>
+                </div>
               </div>
               <div>
                 <h3 className={`text-2xl font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume Connect</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className={`w-2 h-2 rounded-full ${isExtensionInstalled ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-400'}`} />
-                  <span className={`text-[11px] font-black uppercase tracking-widest ${isExtensionInstalled ? 'text-emerald-500' : 'text-zinc-500'}`}>
+                <div className="flex items-center gap-2.5 mt-2">
+                  <div className={`w-2 h-2 rounded-full ${isExtensionInstalled ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.6)] animate-pulse' : 'bg-zinc-500'}`} />
+                  <span className={`text-[11px] font-black uppercase tracking-[0.15em] ${isExtensionInstalled ? 'text-emerald-500' : 'text-zinc-400'}`}>
                     {isExtensionInstalled ? 'Extension Active' : 'Extension Not Detected'}
                   </span>
                 </div>
@@ -154,37 +139,38 @@ function ConnectModal({ isOpen, onClose, isDarkMode }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <button 
                 onClick={handleSyncExtension}
                 disabled={isSyncing}
-                className={`flex flex-col items-center justify-center p-6 rounded-[32px] transition-all transform hover:-translate-y-1 active:scale-95 group ${
-                  isDarkMode ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'bg-purple-600 text-white shadow-xl shadow-purple-600/20'
+                className={`w-full py-8 rounded-[32px] transition-all transform hover:-translate-y-1 active:scale-95 group flex flex-col items-center justify-center gap-4 ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-2xl shadow-purple-900/40' 
+                    : 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-2xl shadow-purple-500/30'
                 }`}
               >
-                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isSyncing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-[24px] flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-8 w-8 ${isSyncing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                 </div>
-                <span className="text-sm font-black">원클릭 동기화</span>
-                <span className="text-[10px] opacity-70 mt-1 font-bold">Extension Sync</span>
-              </button>
-
-              <button 
-                onClick={handleCopyJson}
-                className={`flex flex-col items-center justify-center p-6 rounded-[32px] transition-all transform hover:-translate-y-1 active:scale-95 group ${
-                  isDarkMode ? 'bg-zinc-800 text-zinc-300 border border-zinc-700' : 'bg-white text-zinc-600 border border-zinc-200 shadow-lg shadow-zinc-200/50'
-                }`}
-              >
-                <div className="w-12 h-12 bg-zinc-500/10 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                <div className="text-center">
+                  <span className="text-xl font-black block tracking-tight">원클릭 동기화</span>
+                  <span className="text-xs opacity-70 mt-1 font-bold block uppercase tracking-widest">Extension Real-time Sync</span>
                 </div>
-                <span className="text-sm font-black">표준 데이터 복사</span>
-                <span className="text-[10px] opacity-70 mt-1 font-bold">Copy JSON</span>
               </button>
             </div>
           </div>
-          <div className="mt-10 text-center">
-            <p className={`text-[11px] font-bold leading-relaxed ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>확장 프로그램은 사용자의 데이터를 안전하게 암호화하여 처리합니다.</p>
+
+          <div className="mt-10 flex flex-col items-center gap-4 text-center">
+            <p className={`text-[11px] font-bold leading-relaxed max-w-[280px] ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>확장 프로그램은 사용자의 데이터를 안전하게 암호화하여 처리합니다.</p>
+            
+            <button 
+              onClick={handleCopyJson}
+              className={`text-[11px] font-black uppercase tracking-widest transition-colors hover:underline underline-offset-4 ${
+                isDarkMode ? 'text-zinc-700 hover:text-zinc-500' : 'text-zinc-300 hover:text-zinc-500'
+              }`}
+            >
+              Advanced: Copy Standard JSON
+            </button>
           </div>
         </div>
       </div>
