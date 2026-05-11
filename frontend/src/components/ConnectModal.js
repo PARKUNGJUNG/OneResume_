@@ -83,21 +83,42 @@ function ConnectModal({ isOpen, onClose, isDarkMode, isExtensionInstalled }) {
           <div className="flex justify-between items-start mb-10">
             <div className="flex items-center gap-5">
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-[24px] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-                <div className="relative w-16 h-16 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 rounded-[24px] flex items-center justify-center shadow-xl transition-all duration-500">
+                {/* 외곽 앰비언트 글로우: 우리 브랜드 컬러(Purple/Blue) */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 rounded-[28px] blur-xl opacity-0 group-hover:opacity-100 transition duration-700"></div>
+                
+                <div className={`relative w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-500 shadow-2xl border ${
+                  isDarkMode 
+                    ? 'bg-zinc-800/40 border-white/10 backdrop-blur-md' 
+                    : 'bg-white/80 border-zinc-200 backdrop-blur-md'
+                }`}>
+                  {/* 로고 하단에 아주 살짝 우리 테마의 보랏빛 빛 번짐 추가 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 rounded-[24px]"></div>
+                  
                   <svg 
-                    viewBox="0 0 24 24" 
-                    className="w-10 h-10 fill-none stroke-white" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
+                    viewBox="0 0 48 48" 
+                    className="w-11 h-11 relative z-10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <circle cx="12" cy="12" r="10" />
-                    <circle cx="12" cy="12" r="4" className="fill-white" />
-                    <line x1="21.17" y1="8" x2="12" y2="8" />
-                    <line x1="3.95" y1="6.06" x2="8.54" y2="12" />
-                    <line x1="10.88" y1="21.94" x2="15.46" y2="12" />
+                    <defs>
+                      <linearGradient id="chrome-grad-a" x1="3.2173" y1="15" x2="44.7812" y2="15" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#d93025" />
+                        <stop offset="1" stop-color="#ea4335" />
+                      </linearGradient>
+                      <linearGradient id="chrome-grad-b" x1="20.7219" y1="47.6791" x2="41.5039" y2="11.6837" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#fcc934" />
+                        <stop offset="1" stop-color="#fbbc04" />
+                      </linearGradient>
+                      <linearGradient id="chrome-grad-c" x1="26.5981" y1="46.5015" x2="5.8161" y2="10.506" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#1e8e3e" />
+                        <stop offset="1" stop-color="#34a853" />
+                      </linearGradient>
+                    </defs>
+                    {/* 중앙 흰색 원에 살짝의 투명도와 글로우를 주어 배경과 조화롭게 함 */}
+                    <circle cx="24" cy="23.9947" r="12" fill={isDarkMode ? "#fff" : "#fff"} fillOpacity={isDarkMode ? "0.9" : "1"} />
+                    <path d="M24,12H44.7812a23.9939,23.9939,0,0,0-41.5639.0029L13.6079,30l.0093-.0024A11.9852,11.9852,0,0,1,24,12Z" fill="url(#chrome-grad-a)" />
+                    <circle cx="24" cy="24" r="9.5" fill="#1a73e8" />
+                    <path d="M34.3913,30.0029,24.0007,48A23.994,23.994,0,0,0,44.78,12.0031H23.9989l-.0025.0093A11.985,11.985,0,0,1,34.3913,30.0029Z" fill="url(#chrome-grad-b)" />
+                    <path d="M13.6086,30.0031,3.218,12.006A23.994,23.994,0,0,0,24.0025,48L34.3931,30.0029l-.0067-.0068a11.9852,11.9852,0,0,1-20.7778.007Z" fill="url(#chrome-grad-c)" />
                   </svg>
                 </div>
               </div>

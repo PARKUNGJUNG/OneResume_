@@ -8,6 +8,7 @@ import PageLayout from "../components/PageLayout";
 import ThemeToggle from "../components/ThemeToggle";
 import JDMatchModal from "../components/JDMatchModal";
 import ConnectModal from "../components/ConnectModal";
+import logo from "../logo.svg";
 
 function EditPage({ isDarkMode, toggleDarkMode }) {
   const navigate = useNavigate();
@@ -182,7 +183,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
       <header className={`h-14 px-6 border-b flex items-center justify-between z-20 print:hidden ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg font-black text-xs">O</div>
+            <img src={logo} alt="OneResume Logo" className="w-8 h-8 object-contain" />
             <h1 className={`text-base font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
           </div>
           
