@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/logo.svg" />
+    <link rel="canonical" href="https://oneresume.kr" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#4f46e5" />
 
@@ -30,6 +31,16 @@
     <!-- 모바일 및 웹앱 설정 -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.svg" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- 구글 검색 로고 구조화 데이터 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "url": "https://oneresume.kr",
+        "logo": "https://oneresume.kr/logo.svg"
+      }
+    </script>
 
     <title>OneResume | 나만의 서브도메인 기반 스마트 이력서 관리 플랫폼</title>
   </head>
