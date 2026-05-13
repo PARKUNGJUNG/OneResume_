@@ -120,9 +120,9 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
 
                 {/* 로그인용 오버레이 콘텐츠 */}
                 <div className={`absolute top-0 left-0 w-1/2 h-full p-12 xl:p-16 flex flex-col justify-between items-start text-white transition-all duration-700 ${isRightSide ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-end gap-4">
                     <img src={logo} alt="OneResume Logo" className="w-12 h-12 object-contain" />
-                    <div className="text-xl font-black tracking-tight">OneResume</div>
+                    <div className="text-lg font-black tracking-tight pb-1">OneResume</div>
                   </div>
                   <div className="max-w-sm space-y-4 xl:space-y-6">
                     <div className="w-16 h-1.5 bg-white/40 rounded-full"></div>
@@ -144,9 +144,9 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
 
                 {/* 회원가입/비밀번호찾기용 오버레이 콘텐츠 */}
                 <div className={`absolute top-0 right-0 w-1/2 h-full p-12 xl:p-16 flex flex-col justify-between items-start text-white transition-all duration-700 ${isRightSide ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-end gap-4">
                     <img src={logo} alt="OneResume Logo" className="w-12 h-12 object-contain" />
-                    <div className="text-xl font-black tracking-tight">OneResume</div>
+                    <div className="text-lg font-black tracking-tight pb-1">OneResume</div>
                   </div>
                   <div className="max-w-sm space-y-4 xl:space-y-6">
                     <div className="w-16 h-1.5 bg-white/40 rounded-full"></div>

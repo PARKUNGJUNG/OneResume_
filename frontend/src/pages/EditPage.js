@@ -182,18 +182,23 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
     <PageLayout isDarkMode={isDarkMode} noPadding={true}>
       <header className={`h-14 px-6 border-b flex items-center justify-between z-20 print:hidden ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-end gap-2.5">
             <img src={logo} alt="OneResume Logo" className="w-8 h-8 object-contain" />
-            <h1 className={`text-base font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
+            <div className="flex items-end gap-1.5">
+              <h1 className={`text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
+              <span className={`text-[1.1rem] font-black tracking-tighter ${
+                isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
+              }`}>Developer</span>
+            </div>
           </div>
           
           {isExtensionInstalled && (
-            <div className="flex items-center gap-2.5 animate-in fade-in slide-in-from-left-3 duration-700">
-              <div className={`h-3.5 w-[1.5px] rounded-full ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+            <div className="flex items-end gap-3 animate-in fade-in slide-in-from-left-3 duration-700">
+              <div className={`h-4 w-[1.5px] rounded-full mb-0.5 ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
-                  <span className={`text-[10px] font-black uppercase tracking-wider ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-500/5">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+                  <span className={`text-xs font-black uppercase tracking-wider ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
                     Extension Active
                   </span>
                 </div>

@@ -169,9 +169,17 @@ function UserResumePage({ subdomain }) {
       <header className={`fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-[200] backdrop-blur-xl border-b print:hidden transition-all duration-300 shadow-sm ${
         isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-end gap-2.5">
           <img src={logo} alt="OneResume Logo" className="w-8 h-8 object-contain" />
-          <h1 className={`text-base font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
+          <div className="flex items-end gap-1.5">
+            <h1 className={`text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
+            <span className={`text-[1.1rem] font-extralight mb-0.5 ${isDarkMode ? 'text-zinc-800' : 'text-zinc-200'}`}>|</span>
+            <span className={`text-[1.1rem] font-black tracking-tighter ${
+              isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
+            }`}>
+              {subdomain ? `${subdomain.charAt(0).toUpperCase() + subdomain.slice(1)} Resume` : 'Resume'}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
