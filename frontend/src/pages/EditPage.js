@@ -181,7 +181,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   return (
     <PageLayout isDarkMode={isDarkMode} noPadding={true}>
       <header className={`h-14 px-6 border-b flex items-center justify-between z-20 print:hidden ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
-        <div className="flex items-center gap-4">
+        <div className="flex items-end gap-4 pb-0.5">
           <div className="flex items-end gap-2.5">
             <img src={logo} alt="OneResume Logo" className="w-8 h-8 object-contain" />
             <div className="flex items-end gap-1.5">
@@ -194,8 +194,8 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
           
           {isExtensionInstalled && (
             <div className="flex items-end gap-3 animate-in fade-in slide-in-from-left-3 duration-700">
-              <div className={`h-4 w-[1.5px] rounded-full mb-0.5 ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
-              <div className="flex items-center gap-2">
+              <div className={`h-4 w-[1.5px] rounded-full mb-1.5 ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+              <div className="flex items-center gap-2 mb-0.5">
                 <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-500/5">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
                   <span className={`text-xs font-black uppercase tracking-wider ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
