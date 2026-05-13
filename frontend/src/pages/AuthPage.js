@@ -5,6 +5,8 @@ import Signup from "../components/Signup";
 import ForgotPassword from "../components/ForgotPassword";
 import PageLayout from "../components/PageLayout";
 import logo from "../logo.svg";
+import saraminLogo from "../saramin_logo.svg";
+import jobkoreaLogo from "../jobkorea_logo.svg";
 
 function AuthPage({ isDarkMode, toggleDarkMode }) {
   const [authMode, setAuthMode] = useState('login'); // 'login', 'signup', 'forgot'
@@ -81,7 +83,7 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
           {/* 상단 헤더 - 크기 대폭 축소 및 간격 조절 */}
           <header className="text-center mb-10 relative print:hidden flex-shrink-0">
             <h1 className={`text-4xl md:text-5xl font-black mb-3 tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
-            <p className={`font-bold text-base md:text-lg opacity-50 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>나를 증명하는 가장 완벽한 한 페이지</p>
+            <p className={`font-bold text-base md:text-lg tracking-tight ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>나를 증명하는 가장 완벽한 한 페이지</p>
           </header>
 
           {/* 카드 섹션 - 크기 최적화 */}
@@ -122,7 +124,7 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
                 <div className={`absolute top-0 left-0 w-1/2 h-full p-12 xl:p-16 flex flex-col justify-between items-start text-white transition-all duration-700 ${isRightSide ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                   <div className="flex items-end gap-4">
                     <img src={logo} alt="OneResume Logo" className="w-12 h-12 object-contain" />
-                    <div className="text-lg font-black tracking-tight pb-1">OneResume</div>
+                    <div className="text-[1.35rem] font-black tracking-tighter pb-1">OneResume</div>
                   </div>
                   <div className="max-w-sm space-y-4 xl:space-y-6">
                     <div className="w-16 h-1.5 bg-white/40 rounded-full"></div>
@@ -136,9 +138,29 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
                       한 발짝 더 나아가세요.
                     </p>
                   </div>
-                  <div className="bg-white/10 backdrop-blur-md p-6 xl:p-8 rounded-[32px] border border-white/20 w-full space-y-4 xl:space-y-6">
-                    <div className="flex items-center gap-4 group"><div className="w-8 h-8 xl:w-10 xl:h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg xl:text-xl shadow-inner group-hover:scale-110 transition-transform">🔑</div><div className="flex flex-col"><span className="text-sm font-black uppercase tracking-widest text-white">Secure Access</span><span className="text-[11px] font-bold text-white/60">강력한 보안 기반의 데이터 관리</span></div></div>
-                    <div className="flex items-center gap-4 group"><div className="w-8 h-8 xl:w-10 xl:h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg xl:text-xl shadow-inner group-hover:scale-110 transition-transform">📊</div><div className="flex flex-col"><span className="text-sm font-black uppercase tracking-widest text-white">Insights</span><span className="text-[11px] font-bold text-white/60">나의 이력서 조회수 실시간 분석</span></div></div>
+                  <div className="bg-white/10 backdrop-blur-md p-6 xl:p-8 rounded-[32px] border border-white/20 w-full space-y-4 xl:space-y-5 overflow-hidden">
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Auto-Fill Supported</span>
+                      <span className="text-[10px] font-medium text-white/30 italic">* Non-affiliated</span>
+                    </div>
+                    <div className="marquee-container relative h-12 flex items-center">
+                      <div className="animate-marquee flex items-center gap-24 pr-24">
+                        {[1, 2, 3, 4].map((_, idx) => (
+                          <React.Fragment key={idx}>
+                            <img 
+                              src={saraminLogo} 
+                              alt="Saramin" 
+                              className="h-7 xl:h-8 object-contain brightness-0 invert opacity-90" 
+                            />
+                            <img 
+                              src={jobkoreaLogo} 
+                              alt="Jobkorea" 
+                              className="h-8 xl:h-9 object-contain brightness-0 invert opacity-90" 
+                            />
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -146,7 +168,7 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
                 <div className={`absolute top-0 right-0 w-1/2 h-full p-12 xl:p-16 flex flex-col justify-between items-start text-white transition-all duration-700 ${isRightSide ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                   <div className="flex items-end gap-4">
                     <img src={logo} alt="OneResume Logo" className="w-12 h-12 object-contain" />
-                    <div className="text-lg font-black tracking-tight pb-1">OneResume</div>
+                    <div className="text-[1.35rem] font-black tracking-tighter pb-1">OneResume</div>
                   </div>
                   <div className="max-w-sm space-y-4 xl:space-y-6">
                     <div className="w-16 h-1.5 bg-white/40 rounded-full"></div>
@@ -165,9 +187,29 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
                       )}
                     </p>
                   </div>
-                  <div className="bg-white/10 backdrop-blur-md p-6 xl:p-8 rounded-[32px] border border-white/20 w-full space-y-4 xl:space-y-6">
-                    <div className="flex items-center gap-4 group"><div className="w-8 h-8 xl:w-10 xl:h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg xl:text-xl shadow-inner group-hover:scale-110 transition-transform">{isForgot ? "✉️" : "🌐"}</div><div className="flex flex-col"><span className="text-sm font-black uppercase tracking-widest text-white">{isForgot ? "Fast Recovery" : "Personal Domain"}</span><span className="text-[11px] font-bold text-white/60">{isForgot ? "가장 빠른 계정 복구 시스템" : "나만의 고유한 웹 주소 제공"}</span></div></div>
-                    <div className="flex items-center gap-4 group"><div className="w-8 h-8 xl:w-10 xl:h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg xl:text-xl shadow-inner group-hover:scale-110 transition-transform">{isForgot ? "🛡️" : "🤖"}</div><div className="flex flex-col"><span className="text-sm font-black uppercase tracking-widest text-white">{isForgot ? "Safe Access" : "AI Resume Audit"}</span><span className="text-[11px] font-bold text-white/60">{isForgot ? "철저한 본인 확인 절차" : "Gemini 기반 실시간 이력서 분석"}</span></div></div>
+                  <div className="bg-white/10 backdrop-blur-md p-6 xl:p-8 rounded-[32px] border border-white/20 w-full space-y-4 xl:space-y-5 overflow-hidden">
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Auto-Fill Supported</span>
+                      <span className="text-[10px] font-medium text-white/30 italic">* Non-affiliated</span>
+                    </div>
+                    <div className="marquee-container relative h-12 flex items-center">
+                      <div className="animate-marquee flex items-center gap-24 pr-24">
+                        {[1, 2, 3, 4].map((_, idx) => (
+                          <React.Fragment key={idx}>
+                            <img 
+                              src={saraminLogo} 
+                              alt="Saramin" 
+                              className="h-7 xl:h-8 object-contain brightness-0 invert opacity-90" 
+                            />
+                            <img 
+                              src={jobkoreaLogo} 
+                              alt="Jobkorea" 
+                              className="h-8 xl:h-9 object-contain brightness-0 invert opacity-90" 
+                            />
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
