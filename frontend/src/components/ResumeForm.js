@@ -282,7 +282,7 @@ const ResumeForm = ({
     <div className={`w-full h-full min-h-0 flex flex-col rounded-[24px] overflow-hidden shadow-2xl border ${theme.formBg}`}>
       <div className="flex-none bg-zinc-500/5 border-b border-zinc-700/10 overflow-x-auto hide-scrollbar p-1.5">
         <div className="flex w-max min-w-full gap-1 relative">
-          {/* 슬라이딩 애니메이션 바 복구 및 픽셀 단위 정밀 보정 (패딩 제거 후 gap만 계산: 1.5rem) */}
+          {/* 슬라이딩 애니메이션 바 복구 및 픽셀 단위 정밀 보정 (2.25rem = 좌우 패딩 0.75rem + gap 6개 1.5rem) */}
           <div 
             className="absolute top-0 bottom-0 bg-blue-600 rounded-xl shadow-lg transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] z-0" 
             style={{ 
@@ -385,7 +385,27 @@ const ResumeForm = ({
                         <input type="text" name="role" value={work.role || ""} onChange={(e) => { handleWorkChange(index, e); searchJob(e.target.value); }} onFocus={() => { setActiveJobIndex(`work-${index}`); (work.role || "").length >= 2 && setShowJobList(true); }} onBlur={() => setTimeout(() => setShowJobList(false), 200)} autoComplete="off" placeholder="예: 프론트엔드 개발자" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg}`} />
                         {showJobList && activeJobIndex === `work-${index}` && (<div className={`absolute top-[calc(100%+8px)] left-0 right-0 z-50 max-h-60 overflow-y-auto rounded-2xl border-2 shadow-2xl ${isDarkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-100'}`}>{jobResults.length > 0 ? jobResults.map((item, idx) => (<div key={idx} onClick={() => { handleWorkChange(index, { target: { name: 'role', value: item.jobNm } }); setShowJobList(false); }} className={`px-5 py-3 cursor-pointer border-b last:border-0 transition-colors ${isDarkMode ? 'border-zinc-800 hover:bg-zinc-800' : 'border-zinc-50 hover:bg-blue-50'}`}><div className={`font-black text-[14px] ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>{item.jobNm}</div></div>)) : <div className={`p-5 text-center text-xs font-bold ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>검색 결과가 없습니다.</div>}</div>)}
                       </div>
-                      <div className="space-y-4"><div className="flex items-center justify-between"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>근무 기간</label><label className="flex items-center gap-2 cursor-pointer group"><input type="checkbox" name="isCurrent" checked={work.isCurrent || false} onChange={(e) => handleWorkChange(index, e)} className="sr-only peer" /><div className={`w-4.5 h-4.5 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${isDarkMode ? 'bg-zinc-800 border-zinc-700 peer-checked:bg-blue-600 peer-checked:border-blue-600' : 'bg-white border-zinc-300 peer-checked:bg-blue-600 peer-checked:border-blue-600'}`}><svg className={`w-3 h-3 text-white transition-transform duration-200 ${work.isCurrent ? 'scale-100' : 'scale-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div><span className={`text-[11px] font-black transition-colors ${isDarkMode ? 'text-zinc-300 group-hover:text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-700'}`}>현재 재직 중</span></label></div><PeriodPicker value={work.period || ""} onChange={(val) => handleWorkChange(index, { target: { name: 'period', value: val } })} isDarkMode={isDarkMode} isCurrent={work.isCurrent} /></div>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <label className={`text-[11px] font-black uppercase ${theme.subText}`}>근무 기간</label>
+                          <label className="flex items-center gap-2 cursor-pointer group">
+                            <input 
+                              type="checkbox" 
+                              name="isCurrent" 
+                              checked={work.isCurrent || false} 
+                              onChange={(e) => handleWorkChange(index, e)} 
+                              className="sr-only peer" 
+                            />
+                            <div className={`w-4.5 h-4.5 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${isDarkMode ? 'bg-zinc-800 border-zinc-700 peer-checked:bg-blue-600 peer-checked:border-blue-600' : 'bg-white border-zinc-300 peer-checked:bg-blue-600 peer-checked:border-blue-600'}`}>
+                              <svg className={`w-3 h-3 text-white transition-transform duration-200 ${work.isCurrent ? 'scale-100' : 'scale-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <span className={`text-[11px] font-black transition-colors ${isDarkMode ? 'text-zinc-300 group-hover:text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-700'}`}>현재 재직 중</span>
+                          </label>
+                        </div>
+                        <PeriodPicker value={work.period || ""} onChange={(val) => handleWorkChange(index, { target: { name: 'period', value: val } })} isDarkMode={isDarkMode} isCurrent={work.isCurrent} />
+                      </div>
                       <div className="flex flex-col gap-2 pt-2"><div className="flex justify-between items-center"><label className={`text-[11px] font-black uppercase ${theme.subText}`}>업무 내용 및 주요 성과</label><button type="button" onClick={() => handleAiAudit(`work-${index}`, work.jobDescription)} className="text-[10px] text-blue-600 font-black hover:underline px-2 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg">AI 첨삭 가이드</button></div><textarea name="jobDescription" value={work.jobDescription || ""} onChange={(e) => handleWorkChange(index, e)} onInput={autoExpand} rows="4" className={`w-full px-4 py-3 rounded-xl border ${theme.innerInputBg} resize-none leading-relaxed text-[13px] min-h-[120px] overflow-hidden`} /></div>
                     </div>
                   ))}

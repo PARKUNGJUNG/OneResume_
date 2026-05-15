@@ -23,10 +23,9 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [isExtensionInstalled, setIsExtensionInstalled] = useState(false);
   const [isLayoutOpen, setIsLayoutOpen] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [activeView, setActiveView] = useState('edit'); // 'edit' or 'preview'
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+  const [activeView, setActiveView] = useState('edit'); // 'edit' or 'preview'
 
   // --- 메뉴 외부 클릭 감지 ---
   useEffect(() => {
@@ -37,16 +36,6 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // --- 장치 감지 (터치 vs 마우스) ---
-  useEffect(() => {
-    const checkTouch = () => {
-      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    };
-    checkTouch();
-    window.addEventListener('touchstart', checkTouch, { once: true });
-    return () => window.removeEventListener('touchstart', checkTouch);
   }, []);
 
   // --- 확장 프로그램 실시간 감지 로직 ---
@@ -229,7 +218,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
             <img src={logo} alt="OneResume Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain flex-shrink-0" />
             <div className="flex items-end gap-1.5 whitespace-nowrap">
               <h1 className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
-              <span className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter hidden sm:inline ${
+              <span className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter ${
                 isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
               }`}>Developer</span>
             </div>
@@ -250,16 +239,16 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         </div>
 
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0 justify-end">
-          <div className="flex items-center hide-scrollbar whitespace-nowrap pl-2 md:pl-0 flex-shrink-0" ref={menuRef}>
+          <div className="flex items-center gap-2 md:gap-3 hide-scrollbar whitespace-nowrap pl-2 md:pl-0 flex-shrink-0" ref={menuRef}>
             
             {/* 공용 컨트롤 영역 (Theme) */}
             <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
             
-            {/* 데스크탑 전용 사이드바 토글 버튼 (<) - 마진으로 정밀 여백 조정 */}
+            {/* 데스크탑 전용 사이드바 토글 버튼 (<) */}
             {!isMobile && (
               <button 
                 onClick={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
-                className={`ml-2 md:ml-3 group flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-500 border-2 shadow-sm active:scale-95 flex-shrink-0 ${
+                className={`group flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-500 border-2 shadow-sm active:scale-95 flex-shrink-0 ${
                   isHeaderCollapsed 
                     ? 'bg-blue-600 text-white border-blue-500 shadow-blue-500/20' 
                     : (isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-600' : 'bg-white border-zinc-200 text-zinc-500 hover:text-blue-600 hover:border-blue-200')
@@ -272,8 +261,10 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
               </button>
             )}
 
-            {/* 기능 버튼들 (데스크탑 펼침 상태일 때만 나열) - 부모 flex 간섭을 막기 위해 래퍼에서 마진 처리 */}
-            <div className={`hidden lg:flex items-center transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden ${isHeaderCollapsed ? 'max-w-0 opacity-0 pointer-events-none' : 'max-w-[1000px] opacity-100 ml-2 md:ml-3'}`}>
+            {/* 기능 버튼들 (데스크탑 펼침 상태일 때만 나열) - Collapsed 시 공간 차지 0으로 최적화 */}
+            <div className={`hidden lg:flex items-center transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden ${
+              isHeaderCollapsed ? 'max-w-0 opacity-0 pointer-events-none -ml-2 md:-ml-3' : 'max-w-[1000px] opacity-100'
+            }`}>
               <div className="flex items-center gap-2 md:gap-3">
                 <button 
                   onClick={() => setIsConnectModalOpen(true)} 
@@ -315,8 +306,8 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
               </div>
             </div>
 
-            {/* 프로필 토글 버튼 (모든 뷰에서 메뉴의 입구) */}
-            <div className="relative flex-shrink-0 ml-2 md:ml-3">
+            {/* 프로필 토글 버튼 */}
+            <div className="relative flex-shrink-0">
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-all active:scale-90 overflow-hidden ${
