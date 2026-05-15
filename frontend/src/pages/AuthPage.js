@@ -167,26 +167,34 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
 
   return (
     <PageLayout isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode}>
-      <div className="flex-1 flex flex-col items-center justify-center h-screen overflow-hidden relative">
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen w-full relative py-8 md:py-12">
         <div 
-          className="flex flex-col items-center justify-center transition-all duration-500 ease-out transform-gpu"
+          className="flex flex-col items-center justify-center transition-all duration-500 ease-out transform-gpu w-full"
           style={{ 
-            transform: `scale(${authScale})`,
+            transform: windowSize.width >= 1024 ? `scale(${authScale})` : 'none',
             transformOrigin: 'center center'
           }}
         >
-          {/* 상단 헤더 - 크기 대폭 축소 및 간격 조절 */}
-          <header className="text-center mb-10 relative print:hidden flex-shrink-0">
+          {/* 상단 헤더 - 원래 디자인 유지 */}
+          <header className="text-center mb-10 relative print:hidden flex-shrink-0 px-6">
             <h1 className={`text-4xl md:text-5xl font-black mb-3 tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
             <p className={`font-bold text-base md:text-lg tracking-tight ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>나를 증명하는 가장 완벽한 한 페이지</p>
           </header>
 
-          {/* 카드 섹션 - 크기 최적화 */}
-          <div className={`relative w-[1020px] min-h-[680px] overflow-hidden rounded-[56px] border shadow-[0_40px_100px_-20px_rgba(0,0,0,0.4)] ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+          {/* 카드 섹션 - 모바일에서는 카드 스타일을 제거하고 전체 화면 스타일로 전환 */}
+          <div className={`relative w-full max-w-[1020px] min-h-[500px] md:min-h-[680px] lg:overflow-hidden lg:rounded-[56px] lg:border lg:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.4)] ${
+            isDarkMode 
+              ? 'bg-transparent lg:bg-slate-900 lg:border-slate-800' 
+              : 'bg-transparent lg:bg-white lg:border-slate-100'
+          }`}>
             
             {/* 왼쪽 섹션 (회원가입 & 비밀번호 찾기) */}
-            <div className={`absolute top-0 left-0 w-1/2 h-full transition-all duration-700 ease-in-out flex flex-col justify-center px-10 lg:px-16 ${isRightSide ? 'opacity-100 z-50' : 'opacity-0 z-10 pointer-events-none'}`}>
-              <div className="py-8">
+            <div className={`transition-all duration-700 ease-in-out flex flex-col justify-center px-6 md:px-12 lg:px-16 ${
+              windowSize.width < 1024 
+                ? (isRightSide ? 'block' : 'hidden') 
+                : `absolute top-0 left-0 w-1/2 h-full ${isRightSide ? 'opacity-100 z-50' : 'opacity-0 z-10 pointer-events-none'}`
+            }`}>
+              <div className="py-2 md:py-8">
                 {authMode === 'signup' ? (
                   <Signup onSuccess={handleAuthSuccess} onSwitch={() => setAuthMode('login')} isDarkMode={isDarkMode} />
                 ) : (
@@ -196,8 +204,12 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
             </div>
 
             {/* 오른쪽 섹션 (로그인) */}
-            <div className={`absolute top-0 left-1/2 w-1/2 h-full transition-all duration-700 ease-in-out flex flex-col justify-center px-10 lg:px-16 ${isRightSide ? 'opacity-0 z-10 pointer-events-none' : 'opacity-100 z-50'}`}>
-              <div className="py-8">
+            <div className={`transition-all duration-700 ease-in-out flex flex-col justify-center px-6 md:px-12 lg:px-16 ${
+              windowSize.width < 1024 
+                ? (isRightSide ? 'hidden' : 'block') 
+                : `absolute top-0 left-0 lg:left-1/2 w-full lg:w-1/2 h-full ${isRightSide ? 'opacity-0 z-10 pointer-events-none' : 'opacity-100 z-50'}`
+            }`}>
+              <div className="py-2 md:py-8">
                 <Login 
                   onSuccess={handleAuthSuccess} 
                   onSwitchSignup={() => setAuthMode('signup')}
@@ -209,8 +221,8 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
               </div>
             </div>
 
-            {/* 오버레이 디자인 패널 */}
-            <div className={`absolute top-0 left-0 w-1/2 h-full overflow-hidden transition-all duration-700 ease-in-out z-[100] ${isRightSide ? 'translate-x-full' : 'translate-x-0'}`}>
+            {/* 오버레이 디자인 패널 - 데스크탑 전용 */}
+            <div className={`hidden lg:block absolute top-0 left-0 w-1/2 h-full overflow-hidden transition-all duration-700 ease-in-out z-[100] ${isRightSide ? 'translate-x-full' : 'translate-x-0'}`}>
               <div className={`relative h-full w-[200%] transition-all duration-700 ease-in-out ${isRightSide ? '-translate-x-1/2' : 'translate-x-0'}`}>
                 <img className="w-full h-full absolute object-cover opacity-90" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" alt="Background" />
                 <div className="w-full h-full absolute mix-blend-multiply bg-blue-700/20"></div>

@@ -145,10 +145,19 @@ function UserResumePage({ subdomain }) {
 
   const getScale = () => {
     const a4HeightPx = 1122.52;
+    const a4WidthPx = 793.7;
+    
     if (focusedPage) return (windowSize.height - 120) / a4HeightPx;
-    if (windowSize.width < 640) return 0.35;
-    if (windowSize.width < 1024) return 0.5;
-    return 0.6;
+    
+    // 화면 너비에 따른 동적 스케일 계산 (좌우 여백 고려)
+    const padding = windowSize.width < 640 ? 32 : 80;
+    const availableWidth = windowSize.width - padding;
+    const dynamicScale = availableWidth / a4WidthPx;
+    
+    // 최대/최소 배율 제한 (PC에서는 너무 커지지 않게, 모바일에서는 너무 작아지지 않게)
+    if (windowSize.width < 640) return Math.min(0.45, Math.max(0.35, dynamicScale));
+    if (windowSize.width < 1024) return Math.min(0.55, dynamicScale);
+    return Math.min(0.65, dynamicScale);
   };
 
   const baseScale = getScale();
@@ -166,15 +175,15 @@ function UserResumePage({ subdomain }) {
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-500 ${isDarkMode ? 'bg-[#09090b]' : 'bg-[#f4f4f5]'}`}>
-      <header className={`fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-[200] backdrop-blur-xl border-b print:hidden transition-all duration-300 shadow-sm ${
+      <header className={`fixed top-0 left-0 right-0 h-14 md:h-16 flex items-center justify-between px-4 md:px-6 z-[200] backdrop-blur-xl border-b print:hidden transition-all duration-300 shadow-sm ${
         isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'
       }`}>
-        <div className="flex items-end gap-2.5">
-          <img src={logo} alt="OneResume Logo" className="w-8 h-8 object-contain" />
+        <div className="flex items-end gap-2 md:gap-2.5">
+          <img src={logo} alt="OneResume Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain" />
           <div className="flex items-end gap-1.5">
-            <h1 className={`text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
-            <span className={`text-[1.1rem] font-extralight mb-0.5 ${isDarkMode ? 'text-zinc-800' : 'text-zinc-200'}`}>|</span>
-            <span className={`text-[1.1rem] font-black tracking-tighter ${
+            <h1 className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
+            <span className={`text-[1rem] md:text-[1.1rem] font-extralight mb-0.5 ${isDarkMode ? 'text-zinc-800' : 'text-zinc-200'}`}>|</span>
+            <span className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter ${
               isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
             }`}>
               {subdomain ? `${subdomain.charAt(0).toUpperCase() + subdomain.slice(1)} Resume` : 'Resume'}
@@ -182,22 +191,24 @@ function UserResumePage({ subdomain }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        <div className="flex items-center gap-1.5 md:gap-3 overflow-x-auto hide-scrollbar whitespace-nowrap pl-2 md:pl-0 flex-shrink-0">
+          <div className="hidden md:block flex-shrink-0">
+            <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+          </div>
           <button 
             onClick={copyShareLink} 
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 h-9 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-blue-600/20 transition-all active:scale-95"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 md:px-4 h-8 md:h-9 rounded-lg md:rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex-shrink-0"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
             </svg>
             링크 복사
           </button>
           <button 
             onClick={downloadPDF} 
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 h-9 rounded-xl text-xs shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center gap-2"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 md:px-4 h-8 md:h-9 rounded-lg md:rounded-xl text-[10px] md:text-xs shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center gap-1.5 flex-shrink-0"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             PDF 저장
@@ -205,7 +216,7 @@ function UserResumePage({ subdomain }) {
         </div>
       </header>
 
-      <main className={`pt-24 pb-20 px-4 flex flex-col items-center justify-start min-h-screen relative z-10 print:hidden ${focusedPage ? 'overflow-hidden' : ''}`}>
+      <main className={`pt-20 md:pt-24 pb-12 md:pb-20 px-4 flex flex-col items-center justify-start min-h-screen relative z-10 print:hidden ${focusedPage ? 'overflow-hidden' : ''}`}>
         {focusedPage && (
           <div className="fixed inset-0 z-[150] pointer-events-none flex flex-col items-center justify-between p-6 animate-fade-in print:hidden">
             <div className="w-full flex justify-end pointer-events-auto">
@@ -250,7 +261,7 @@ function UserResumePage({ subdomain }) {
               formData={formData} 
               ref={resumeRef} 
               isDarkMode={isDarkMode} 
-              paneWidth={50} 
+              paneWidth={windowSize.width < 1024 ? 20 : 50} 
               focusedPage={focusedPage} 
               setFocusedPage={setFocusedPage} 
               setTotalPages={setTotalPages} 
