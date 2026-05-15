@@ -17,10 +17,12 @@ function App() {
   const host = window.location.hostname;
   const parts = host.split('.');
   const isS3 = host.includes('s3-website');
+  const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host);
   
   // oneresume.kr (parts.length=2) 인 경우 subdomain은 null
   // user.oneresume.kr (parts.length=3) 인 경우 subdomain은 'user'
-  const subdomain = (parts.length > 2 && !isS3 && parts[0] !== 'www' && parts[0] !== 'localhost') ? parts[0] : null;
+  // IP 주소(isIP)이거나 localhost, www 인 경우도 서브도메인 제외
+  const subdomain = (parts.length > 2 && !isS3 && !isIP && parts[0] !== 'www' && parts[0] !== 'localhost') ? parts[0] : null;
 
 		// 컴포넌트가 처음 로드될 때 딱 한 번 실행
   useEffect(() => {

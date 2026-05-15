@@ -280,16 +280,31 @@ const ResumeForm = ({
 
   return (
     <div className={`w-full h-full min-h-0 flex flex-col rounded-[24px] overflow-hidden shadow-2xl border ${theme.formBg}`}>
-      <div className="flex-none relative p-1.5 bg-zinc-500/5 border-b border-zinc-700/10 overflow-x-auto no-scrollbar">
-        <div className="flex w-full relative z-10">
+      <div className="flex-none bg-zinc-500/5 border-b border-zinc-700/10 overflow-x-auto hide-scrollbar p-1.5">
+        <div className="flex w-max min-w-full gap-1 relative">
+          {/* 슬라이딩 애니메이션 바 복구 및 픽셀 단위 정밀 보정 (패딩 제거 후 gap만 계산: 1.5rem) */}
+          <div 
+            className="absolute top-0 bottom-0 bg-blue-600 rounded-xl shadow-lg transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] z-0" 
+            style={{ 
+              width: `calc((100% - 1.5rem) / 7)`,
+              left: `calc(${activeIndex} * ((100% - 1.5rem) / 7 + 0.25rem))`
+            }} 
+          />
           {tabs.map((tab, idx) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[12px] font-black transition-all duration-500 py-3.5 ${activeTab === tab.id ? theme.tabActive : theme.tabInactive}`}>
+            <button 
+              key={tab.id} 
+              onClick={() => setActiveTab(tab.id)} 
+              className={`flex-1 min-w-[90px] sm:min-w-[110px] flex items-center justify-center gap-2 rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 py-3 px-3 relative z-10 ${
+                activeTab === tab.id 
+                  ? 'text-white' 
+                  : theme.tabInactive
+              }`}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d={tab.icon} /></svg>
               <span className="whitespace-nowrap">{tab.label}</span>
             </button>
           ))}
         </div>
-        <div className="absolute top-1.5 bottom-1.5 bg-blue-600 rounded-xl shadow-lg transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]" style={{ left: `calc(0.375rem + ${activeIndex} * (100% - 0.75rem) / 7)`, width: 'calc((100% - 0.75rem) / 7)' }} />
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 lg:p-8">
