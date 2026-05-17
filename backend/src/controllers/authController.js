@@ -285,13 +285,15 @@ const mailOptions = {
 exports.setupProfile = async (req, res) => {
 	try {
 		const userId = req.user.id; // authMiddleware에서 넣어준 유저 정보
-		const { username, age, phone, useInternationalAge } = req.body;
+		const { username, email, age, phone, useInternationalAge, job } = req.body;
 
 		const updateData = {
 			username: username,
+			email: email || undefined, // 이메일이 제공된 경우 업데이트
 			age: age ? parseInt(age) : null,
 			phone: phone || null,
 			useInternationalAge: useInternationalAge === true || useInternationalAge === 'true',
+			job: job || null, // 직무 정보 추가
 			isProfileComplete: true, // 프로필 설정 완료!
 			updatedAt: new Date(),
 	};
