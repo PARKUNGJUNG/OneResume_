@@ -4,7 +4,7 @@ const ThemeToggle = ({ isDarkMode, toggleDarkMode }) => {
   return (
     <button
       onClick={toggleDarkMode}
-      className={`relative w-[64px] h-[36px] rounded-full transition-all duration-500 border overflow-hidden flex items-center shadow-sm active:scale-95
+      className={`relative w-[64px] h-[36px] rounded-full transition-all duration-500 border-2 overflow-hidden flex items-center shadow-sm active:scale-95
         ${isDarkMode ? "bg-zinc-800 border-zinc-700" : "bg-blue-100 border-blue-200"}`}
     >
       {/* 움직이는 원 (Slider) - 다른 버튼들 높이에 맞춰 36px/32px로 최적화 */}

@@ -23,6 +23,7 @@ const useResume = () => {
     addressDetail: "",
     useInternationalAge: false,
     job: "",
+    provider: "LOCAL",
     resumeTitle: "개발자 이력서",
     school: "",
     major: "",
@@ -66,6 +67,7 @@ const useResume = () => {
       gender: user.gender || "",
       useInternationalAge: user.useInternationalAge || false,
       job: user.job || "",
+      provider: user.provider || "LOCAL", // 실제 데이터로 복구
       resumeTitle: resume.title || "개발자 이력서",
       school: eduParts[0] || "",
       major: eduParts[1] || "",

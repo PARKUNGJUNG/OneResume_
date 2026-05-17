@@ -179,9 +179,15 @@ function UserResumePage({ subdomain }) {
         isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'
       }`}>
         <div className="flex items-end gap-2 md:gap-2.5">
-          <img src={logo} alt="OneResume Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain" />
+          <div 
+            onClick={() => window.location.reload()}
+            className="flex items-end gap-2 md:gap-2.5 cursor-pointer group"
+            title="페이지 새로고침"
+          >
+            <img src={logo} alt="OneResume Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain transition-transform group-hover:scale-110" />
+            <h1 className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter transition-colors ${isDarkMode ? 'text-white group-hover:text-blue-400' : 'text-zinc-800 group-hover:text-blue-600'}`}>OneResume</h1>
+          </div>
           <div className="flex items-end gap-1.5">
-            <h1 className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
             <span className={`text-[1rem] md:text-[1.1rem] font-extralight mb-0.5 ${isDarkMode ? 'text-zinc-800' : 'text-zinc-200'}`}>|</span>
             <span className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter ${
               isDarkMode ? 'text-indigo-400' : 'text-indigo-600'

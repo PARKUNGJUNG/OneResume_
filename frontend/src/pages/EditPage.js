@@ -215,9 +215,21 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
       <header className={`h-14 px-4 md:px-6 border-b flex items-center justify-between z-40 print:hidden ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
         <div className="flex items-center gap-3 md:gap-4 flex-shrink-0 mr-4">
           <div className="flex items-center gap-2 md:gap-2.5 flex-shrink-0">
-            <img src={logo} alt="OneResume Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain flex-shrink-0" />
+            <img 
+              src={logo} 
+              alt="OneResume Logo" 
+              onClick={() => window.location.reload()}
+              className="w-7 h-7 md:w-8 md:h-8 object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110 active:scale-95" 
+              title="편집 페이지 새로고침"
+            />
             <div className="flex items-end gap-1.5 whitespace-nowrap">
-              <h1 className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
+              <h1 
+                onClick={() => window.location.reload()}
+                className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter cursor-pointer transition-colors ${isDarkMode ? 'text-white hover:text-blue-400' : 'text-zinc-800 hover:text-blue-600'}`}
+                title="편집 페이지 새로고침"
+              >
+                OneResume
+              </h1>
               <button 
                 onClick={() => navigate('/setup-profile', { state: { step: 2 } })}
                 className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter transition-all hover:scale-105 active:scale-95 hover:underline underline-offset-4 cursor-pointer ${(() => {
@@ -259,8 +271,8 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
               </button>
             </div>
           </div>
-          
-          {isExtensionInstalled && (
+
+                  {isExtensionInstalled && (
             <div className="hidden lg:flex items-end gap-3 animate-in fade-in slide-in-from-left-3 duration-700 flex-shrink-0 border-l border-zinc-500/20 pl-3">
               <div className="flex items-center gap-2 mb-0.5">
                 <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-500/5">
@@ -304,16 +316,16 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
               <div className="flex items-center gap-2 md:gap-3">
                 <button 
                   onClick={() => setIsConnectModalOpen(true)} 
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-black px-4 h-9 rounded-lg md:rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 shadow-lg shadow-purple-600/20 transition-all active:scale-95 flex-shrink-0"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-black px-4 h-9 rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 border-2 border-purple-500/20 shadow-lg shadow-purple-600/20 transition-all active:scale-95 flex-shrink-0"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 flex-shrink-0 fill-current" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 10V3L4 14H11V21L20 10H13Z" />
                   </svg>
                   확장 프로그램 연동
                 </button>
                 <button 
                   onClick={() => setIsJDModalOpen(true)} 
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-3 md:px-4 h-8 md:h-9 rounded-lg md:rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex-shrink-0"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-4 h-9 rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 border-2 border-indigo-500/20 shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex-shrink-0"
                 >
                   <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 flex-shrink-0 fill-white">
                     <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
@@ -322,7 +334,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                 </button>
                 <button 
                   onClick={copyShareLink} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-black px-3 md:px-4 h-8 md:h-9 rounded-lg md:rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex-shrink-0"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-black px-4 h-9 rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 border-2 border-blue-500/20 shadow-lg shadow-blue-600/20 transition-all active:scale-95 flex-shrink-0"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
@@ -331,79 +343,155 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                 </button>
                 <button 
                   onClick={downloadPDF} 
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-3 md:px-4 h-8 md:h-9 rounded-lg md:rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex-shrink-0"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 h-9 rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 border-2 border-emerald-500/20 shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex-shrink-0"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   PDF 저장
                 </button>
-                <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white font-bold px-4 h-9 rounded-xl text-xs transition-all active:scale-95 flex-shrink-0">로그아웃</button>
               </div>
             </div>
 
-            {/* 프로필 토글 버튼 */}
-            <div className="relative flex-shrink-0">
+            {/* 프로필 토글 버튼 (완벽한 수평 정렬을 위한 픽셀 튜닝) */}
+            <div className="relative flex-shrink-0 flex items-center h-9">
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-all active:scale-90 overflow-hidden ${
-                  isMenuOpen ? 'border-blue-500 ring-4 ring-blue-500/10 shadow-lg' : 'border-zinc-200 dark:border-zinc-700 hover:border-blue-400'
+                className={`group flex items-center h-9 gap-2.5 px-3 rounded-xl border-2 transition-all active:scale-95 shadow-sm antialiased ${
+                  isMenuOpen 
+                    ? 'border-blue-500 bg-blue-500/5 ring-4 ring-blue-500/10' 
+                    : (isDarkMode ? 'bg-zinc-800 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/80' : 'bg-white border-zinc-200 hover:border-blue-300 hover:bg-zinc-50')
                 }`}
               >
-                {formData.profileImageUrl ? (
-                  <img src={formData.profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <div className={`w-full h-full flex items-center justify-center ${isDarkMode ? 'bg-zinc-800 text-zinc-400' : 'bg-zinc-100 text-zinc-500'}`}>
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  </div>
-                )}
+                {/* 아바타 영역 (24px로 고정하여 h-9 내에서 완벽한 수직 중앙 정렬) */}
+                <div className={`w-6 h-6 rounded-full overflow-hidden border shadow-inner flex-shrink-0 ${isDarkMode ? 'border-zinc-700 bg-zinc-900' : 'border-zinc-100 bg-zinc-50'}`}>
+                  {formData.profileImageUrl ? (
+                    <img src={formData.profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className={`w-full h-full flex items-center justify-center ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    </div>
+                  )}
+                </div>
+
+                {/* 이름 및 소셜 로고 영역 */}
+                <div className="flex items-center gap-2 h-full">
+                  <span className={`text-[12px] font-black tracking-tighter leading-none ${isDarkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>
+                    {formData.username || '사용자'}
+                  </span>
+                  
+                  {/* 소셜 로그인 로고 뱃지 */}
+                  {formData.provider && formData.provider !== 'LOCAL' && (
+                    <div className="flex items-center h-full">
+                      {formData.provider === 'KAKAO' && (
+                        <div className="w-3.5 h-3.5 bg-[#FEE500] rounded-[3px] flex items-center justify-center shadow-[0_0.5px_2px_rgba(0,0,0,0.1)]">
+                          <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 text-[#3C1E1E]" fill="currentColor">
+                            <path d="M12 3C7.029 3 3 6.129 3 10.129c0 2.59 1.676 4.88 4.232 6.13l-1.077 3.96c-.083.303.326.541.53.37l4.67-3.111c.532.062 1.078.093 1.645.093 4.971 0 9-3.129 9-7.129C21 6.129 16.971 3 12 3z" />
+                          </svg>
+                        </div>
+                      )}
+                      {formData.provider === 'NAVER' && (
+                        <div className="w-3.5 h-3.5 bg-[#03C75A] rounded-[3px] flex items-center justify-center shadow-[0_0.5px_2px_rgba(0,0,0,0.1)]">
+                          <span className="text-[7.5px] font-[1000] text-white leading-none transform -translate-y-[0.5px]">N</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* 드롭다운 표시 아이콘 */}
+                <div className="flex items-center h-full">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className={`w-3.5 h-3.5 transition-all duration-300 ${isMenuOpen ? 'rotate-180 text-blue-500' : 'text-zinc-400 group-hover:text-zinc-500'}`} 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    strokeWidth={3}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </button>
 
-              {/* 드롭다운 메뉴 (모바일/태블릿 OR 데스크탑 축소 상태일 때 기능 노출) */}
+              {/* 드롭다운 메뉴 (UX 기반 정보 재배치: 계정 정보 -> 빠른 도구 -> 로그아웃) */}
               {isMenuOpen && (
-                <div className={`absolute top-full right-0 mt-3 w-56 py-2 rounded-2xl border shadow-2xl animate-in fade-in zoom-in-95 duration-200 z-[110] ${
+                <div className={`absolute top-full right-0 mt-3 w-64 p-1.5 rounded-2xl border shadow-2xl animate-in fade-in zoom-in-95 duration-200 z-[110] ${
                   isDarkMode ? 'bg-zinc-900 border-zinc-700 shadow-black/50' : 'bg-white border-zinc-100 shadow-zinc-200/50'
                 }`}>
                   
-                  {/* 모바일이거나 데스크탑 축소 상태일 때만 도구 메뉴 표시 */}
+                  {/* 1. 계정 정보 (최상단 Identity 섹션) */}
+                  <div className="px-4 py-3 border-b border-zinc-500/10 mb-1">
+                    <p className={`text-[10px] font-black uppercase tracking-widest mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>계정 정보</p>
+                    <p className={`text-sm font-black truncate ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>{formData.username || '사용자'}</p>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <p className={`text-[10px] font-bold ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                        {formData.provider === 'KAKAO' ? '카카오 계정으로 로그인됨' : 
+                         formData.provider === 'NAVER' ? '네이버 계정으로 로그인됨' : 
+                         'OneResume 이메일로 로그인됨'}
+                      </p>
+                      <div className="flex items-center">
+                        {formData.provider === 'KAKAO' && (
+                          <div className="w-3.5 h-3.5 bg-[#FEE500] rounded-[2px] flex items-center justify-center shadow-sm">
+                            <svg viewBox="0 0 24 24" className="w-2 h-2 text-[#3C1E1E]" fill="currentColor">
+                              <path d="M12 3C7.029 3 3 6.129 3 10.129c0 2.59 1.676 4.88 4.232 6.13l-1.077 3.96c-.083.303.326.541.53.37l4.67-3.111c.532.062 1.078.093 1.645.093 4.971 0 9-3.129 9-7.129C21 6.129 16.971 3 12 3z" />
+                            </svg>
+                          </div>
+                        )}
+                        {formData.provider === 'NAVER' && (
+                          <div className="w-3.5 h-3.5 bg-[#03C75A] rounded-[2px] flex items-center justify-center shadow-sm">
+                            <span className="text-[7px] font-[1000] text-white leading-none">N</span>
+                          </div>
+                        )}
+                        {( !formData.provider || formData.provider === 'LOCAL') && (
+                          <img src={logo} alt="OneResume" className="w-4 h-4 object-contain opacity-80" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. 빠른 도구 (중간 Utility 섹션 - 모바일/축소 상태) */}
                   {(isMobile || isHeaderCollapsed) && (
                     <div className="border-b border-zinc-500/10 mb-1 pb-1">
                       <div className="px-4 py-2">
-                        <p className={`text-[10px] font-black uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>Quick Tools</p>
+                        <p className={`text-[10px] font-black uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>빠른 도구</p>
                       </div>
-                      <button onClick={() => { setIsConnectModalOpen(true); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs font-black transition-colors ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800 hover:text-white' : 'text-zinc-600 hover:bg-blue-50 hover:text-blue-600'}`}>
-                        <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                      <button onClick={() => { setIsConnectModalOpen(true); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-blue-600'}`}>
+                        <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600 flex-shrink-0">
+                          <svg viewBox="0 0 24 24" className="h-4 w-4 flex-shrink-0 fill-current" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 10V3L4 14H11V21L20 10H13Z" />
+                          </svg>
                         </div>
                         확장 프로그램 연동
                       </button>
-                      <button onClick={() => { setIsJDModalOpen(true); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs font-black transition-colors ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800 hover:text-white' : 'text-zinc-600 hover:bg-blue-50 hover:text-blue-600'}`}>
-                        <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" /></svg>
+                      <button onClick={() => { setIsJDModalOpen(true); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-indigo-600'}`}>
+                        <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 flex-shrink-0">
+                          <svg viewBox="0 0 24 24" className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+                          </svg>
                         </div>
                         AI 공고 매칭
                       </button>
-                      <button onClick={() => { copyShareLink(); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs font-black transition-colors ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800 hover:text-white' : 'text-zinc-600 hover:bg-blue-50 hover:text-blue-600'}`}>
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                      <button onClick={() => { copyShareLink(); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-blue-600'}`}>
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 flex-shrink-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                          </svg>
                         </div>
                         링크 복사
                       </button>
-                      <button onClick={() => { downloadPDF(); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs font-black transition-colors ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800 hover:text-white' : 'text-zinc-600 hover:bg-blue-50 hover:text-blue-600'}`}>
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                      <button onClick={() => { downloadPDF(); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-emerald-600'}`}>
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         </div>
                         PDF 저장
                       </button>
                     </div>
                   )}
-                  
-                  <div className="px-4 py-2 mb-1">
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>Account</p>
-                    <p className={`text-xs font-black truncate ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>{formData.username || '사용자'}</p>
-                  </div>
-                  <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-black text-red-500 hover:bg-red-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
+
+                  {/* 3. 로그아웃 (최하단 Destructive 섹션) */}
+                  <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-xs font-black text-red-500 rounded-xl hover:bg-red-500/5 transition-all group/logout">
+                    <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover/logout:bg-red-500/20 transition-colors flex-shrink-0">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     </div>
                     로그아웃
