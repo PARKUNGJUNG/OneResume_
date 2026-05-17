@@ -32,12 +32,12 @@ async function updatePopup() {
 
     // 2. API 호출
     try {
-      statusText.innerText = "업데이트 중...";
+      statusText.innerText = "데이터 로드 중...";
       const response = await fetch(`${API_BASE_URL}/api/resume/export`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      if (!response.ok) throw new Error("세션이 만료되었습니다.");
+      if (!response.ok) throw new Error("세션 만료: 재동기화 필요");
 
       const data = await response.json();
       currentResumeData = data;
@@ -48,13 +48,13 @@ async function updatePopup() {
       statusText.style.color = "#10b981";
       autofillBtn.disabled = false;
       
-      dataDisplay.innerText = `[${data.basics.name}] 님의 마스터 데이터가 로드되었습니다.\n\n최종 업데이트: ${new Date(data.generatedAt).toLocaleString()}`;
+      dataDisplay.innerHTML = `[<span class="user-name">${data.basics.name}</span>] 님의 이력서 데이터가 로드되었습니다.<br><br><span class="sync-badge">최종 업데이트: ${new Date(data.generatedAt).toLocaleString()}</span>`;
       lastSync.innerText = new Date().toLocaleTimeString();
       
     } catch (error) {
       statusDot.classList.remove('active');
-      statusText.innerText = "오류 발생";
-      dataDisplay.innerText = error.message;
+      statusText.innerText = "연동 필요";
+      dataDisplay.innerHTML = `<span style="color: #ef4444;">${error.message}</span>`;
       autofillBtn.disabled = true;
     }
   });

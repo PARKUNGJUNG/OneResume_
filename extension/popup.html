@@ -5,25 +5,59 @@
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     
+    :root {
+      --bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --status-bg: #f8fafc;
+      --status-border: #e2e8f0;
+      --badge-bg: #f1f5f9;
+      --btn-outline-bg: #ffffff;
+      --btn-outline-text: #475569;
+      --preview-bg: #f8fafc;
+      --preview-text: #475569;
+      --header-grad: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #18181b;
+        --text: #f8fafc;
+        --text-muted: #a1a1aa;
+        --accent: #60a5fa;
+        --status-bg: #27272a;
+        --status-border: #3f3f46;
+        --badge-bg: #18181b;
+        --btn-outline-bg: #27272a;
+        --btn-outline-text: #d4d4d8;
+        --preview-bg: #27272a;
+        --preview-text: #f8fafc;
+        --header-grad: linear-gradient(135deg, #27272a 0%, #18181b 100%);
+      }
+    }
+
     body {
       width: 380px;
       margin: 0;
       padding: 0;
       font-family: 'Pretendard', sans-serif;
-      background: #f1f5f9;
-      color: #1e293b;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
     }
     .card {
-      background: white;
-      margin: 16px;
-      border-radius: 28px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      background: var(--bg);
+      margin: 0;
+      border-radius: 0;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.7);
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
     }
     .header {
-      padding: 24px;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      padding: 26px 24px;
+      background: var(--header-grad);
       color: white;
       display: flex;
       justify-content: space-between;
@@ -32,14 +66,14 @@
     .header-title {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .logo-box {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(8px);
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -51,26 +85,29 @@
       height: 100%;
       object-fit: cover;
     }
-    h2 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+    h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
     
-    .content { padding: 24px; }
+    .content { padding: 20px; flex: 1; display: flex; flex-direction: column; }
     
     .status-section {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       padding: 12px 16px;
-      background: #f8fafc;
+      background: var(--status-bg);
       border-radius: 16px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--status-border);
     }
-    .status-info { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
+    .status-info { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; }
     .status-dot.active { background: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.5); animation: pulse 2s infinite; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
     
-    .action-group { display: flex; flex-direction: column; gap: 12px; }
+    .user-name { color: var(--accent); font-weight: 800; }
+    .sync-badge { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+    .action-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
     
     .btn {
       width: 100%;
@@ -84,7 +121,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
     .btn-primary { 
       background: #2563eb; 
@@ -96,25 +133,27 @@
     .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
     
     .btn-outline {
-      background: white;
-      color: #475569;
-      border: 1px solid #e2e8f0;
+      background: var(--btn-outline-bg);
+      color: var(--btn-outline-text);
+      border: 1px solid var(--status-border);
     }
-    .btn-outline:hover { background: #f8fafc; color: #1e293b; border-color: #cbd5e1; }
+    .btn-outline:hover { background: var(--status-bg); border-color: var(--text-muted); }
     
     .data-preview {
-      margin-top: 24px;
       padding: 16px;
-      background: #1e293b;
-      border-radius: 16px;
-      max-height: 150px;
+      background: var(--preview-bg);
+      border-radius: 18px;
+      max-height: 120px;
       overflow-y: auto;
-      font-family: 'monospace';
-      font-size: 11px;
-      color: #94a3b8;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 14px;
+      color: var(--text);
       white-space: pre-wrap;
+      line-height: 1.6;
+      border: 1px solid var(--status-border);
+      text-align: center;
     }
-    .footer { text-align: center; padding: 16px; font-size: 11px; color: #94a3b8; font-weight: 600; }
+    .footer { text-align: center; padding: 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -134,12 +173,12 @@
           <div id="status-dot" class="status-dot"></div>
           <span id="status-text">연동 상태 확인 중...</span>
         </div>
-        <div id="last-sync" style="font-size: 10px; color: #94a3b8;"></div>
+        <div id="last-sync" class="sync-badge"></div>
       </div>
 
       <div class="action-group">
         <button id="autofill-btn" class="btn btn-primary" disabled>
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-7l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2"/><path d="M11 2h2a2 2 0 0 1 2 2v1l1 1h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3l-1 1v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1l-1-1H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3l1-1V4a2 2 0 0 1 2-2z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
           현재 페이지에 자동 입력
         </button>
         <button id="refresh-btn" class="btn btn-outline">
