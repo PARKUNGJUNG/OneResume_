@@ -218,9 +218,45 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
             <img src={logo} alt="OneResume Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain flex-shrink-0" />
             <div className="flex items-end gap-1.5 whitespace-nowrap">
               <h1 className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>
-              <span className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter ${
-                isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
-              }`}>Developer</span>
+              <button 
+                onClick={() => navigate('/setup-profile', { state: { step: 2 } })}
+                className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter transition-all hover:scale-105 active:scale-95 hover:underline underline-offset-4 cursor-pointer ${(() => {
+                  const colorMap = {
+                    developer: isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700',
+                    it: isDarkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700',
+                    admin: isDarkMode ? 'text-teal-400 hover:text-teal-300' : 'text-teal-600 hover:text-teal-700',
+                    sales: isDarkMode ? 'text-orange-400 hover:text-orange-300' : 'text-orange-600 hover:text-orange-700',
+                    design: isDarkMode ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-700',
+                    finance: isDarkMode ? 'text-amber-400 hover:text-amber-300' : 'text-amber-600 hover:text-amber-700',
+                    hr: isDarkMode ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-700',
+                    service: isDarkMode ? 'text-cyan-400 hover:text-cyan-300' : 'text-cyan-600 hover:text-cyan-700',
+                    marketing_pr: isDarkMode ? 'text-rose-400 hover:text-rose-300' : 'text-rose-600 hover:text-rose-700',
+                    education: isDarkMode ? 'text-orange-400 hover:text-orange-300' : 'text-orange-600 hover:text-orange-700',
+                    medical: isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700',
+                    legal: isDarkMode ? 'text-slate-400 hover:text-slate-300' : 'text-slate-600 hover:text-slate-700'
+                  };
+                  return colorMap[formData.job] || (isDarkMode ? 'text-indigo-400' : 'text-indigo-600');
+                })()}`}
+                title="직무 변경하기"
+              >
+                {(() => {
+                  const jobMap = {
+                    developer: 'Developer',
+                    it: 'IT Engineer',
+                    admin: 'General Affairs',
+                    sales: 'Sales',
+                    design: 'Designer',
+                    finance: 'Finance',
+                    hr: 'HR',
+                    service: 'CS',
+                    marketing_pr: 'Marketer',
+                    education: 'Educator',
+                    medical: 'Medical',
+                    legal: 'Legal Affairs'
+                  };
+                  return jobMap[formData.job] || 'Not Set';
+                })()}
+              </button>
             </div>
           </div>
           
