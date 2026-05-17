@@ -34,6 +34,7 @@ model User {
   address              String?
   addressDetail        String?
   useInternationalAge  Boolean   @default(false)
+  job                  String?
   resumes              Resume[]
 }
 
