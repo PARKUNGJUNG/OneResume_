@@ -206,6 +206,17 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   };
 
   const baseScale = getScale();
+  
+  // --- 실제 시각적 너비 계산 (튐 현상 방지용) ---
+  const a4WidthPx = 793.7;
+  const a4HeightPx = 1122.52;
+  const gapPx = 8 * 3.7795; // 8mm gap
+  const currentPaneWidth = isMobile ? 20 : (100 - leftWidth);
+  const cols = currentPaneWidth > 75 ? 4 : (currentPaneWidth > 55 ? 3 : (currentPaneWidth > 30 ? 2 : 1));
+  const rows = totalPages ? Math.ceil(totalPages / cols) : 1;
+  const scaledWidth = (cols * a4WidthPx + (cols - 1) * gapPx) * baseScale;
+  const scaledHeight = (rows * a4HeightPx + (rows - 1) * gapPx) * baseScale;
+
   const transitionClass = isResizing 
     ? "transition-none" 
     : "transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]";
