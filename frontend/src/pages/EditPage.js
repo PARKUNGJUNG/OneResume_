@@ -653,9 +653,9 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                 </div>
               )}
 
-              <div className={`w-full h-full flex justify-center items-start custom-scrollbar touch-none select-none ${focusedPage ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
+              <div className={`w-full h-full flex justify-center items-start custom-scrollbar select-none overflow-x-hidden ${focusedPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
                 <div 
-                  className={`${transitionClass} transform-gpu flex items-center justify-center shrink-0 pointer-events-auto touch-pan-y ${isDragging ? 'opacity-30 grayscale' : 'opacity-100'}`} 
+                  className={`${transitionClass} transform-gpu flex items-center justify-center shrink-0 pointer-events-auto ${isDragging ? 'opacity-30 grayscale' : 'opacity-100'}`} 
                   style={{ 
                     transform: `scale(${baseScale})`, 
                     transformOrigin: 'top center', 
