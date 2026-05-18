@@ -487,10 +487,14 @@ const ResumePreview = React.memo(React.forwardRef((props, ref) => {
   }
 
   return (
-    <div ref={ref} className="relative flex items-center justify-center transition-all duration-700 ease-in-out" style={{ width: canvasW, height: canvasH }}>
+    <div ref={ref} className="relative flex items-center justify-center shrink-0" style={{ width: canvasW, height: canvasH }}>
       <div 
-        className="relative w-full h-full transition-all duration-[800ms] ease-[cubic-bezier(0.23,1,0.32,1)]"
-        style={{ transform: `translate(${translateX}, ${translateY}) scale(${zoomScale})` }}
+        className="relative w-full h-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform"
+        style={{ 
+          transform: `translate(${translateX}, ${translateY}) scale(${zoomScale})`,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden'
+        }}
       >
         {pages.map((page, index) => {
           const isFocused = focusedPage === page.id;

@@ -289,8 +289,10 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0 justify-end">
           <div className="flex items-center gap-2 md:gap-3 hide-scrollbar whitespace-nowrap pl-2 md:pl-0 flex-shrink-0" ref={menuRef}>
             
-            {/* 공용 컨트롤 영역 (Theme) */}
-            <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+            {/* 공용 컨트롤 영역 (Theme) - 데스크탑 전용 */}
+            <div className="hidden md:block">
+              <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+            </div>
             
             {/* 데스크탑 전용 사이드바 토글 버튼 (<) */}
             {!isMobile && (
@@ -456,6 +458,20 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                       <div className="px-4 py-2">
                         <p className={`text-[10px] font-black uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>빠른 도구</p>
                       </div>
+
+                      {/* 모바일 전용 다크모드 토글 */}
+                      {isMobile && (
+                        <button onClick={(e) => { e.stopPropagation(); toggleDarkMode(); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'}`}>
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isDarkMode ? 'bg-amber-500/10 text-amber-500' : 'bg-zinc-800/10 text-zinc-700'}`}>
+                            {isDarkMode ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                            )}
+                          </div>
+                          {isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'}
+                        </button>
+                      )}
                       <button onClick={() => { setIsConnectModalOpen(true); setIsMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-blue-600'}`}>
                         <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600 flex-shrink-0">
                           <svg viewBox="0 0 24 24" className="h-4 w-4 flex-shrink-0 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -637,14 +653,15 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                 </div>
               )}
 
-              <div className={`w-full h-full flex justify-center items-start custom-scrollbar ${focusedPage ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
+              <div className={`w-full h-full flex justify-center items-start custom-scrollbar touch-none select-none ${focusedPage ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
                 <div 
-                  className={`${transitionClass} transform-gpu flex items-center justify-center shrink-0 ${isDragging ? 'opacity-30 grayscale' : 'opacity-100'}`} 
+                  className={`${transitionClass} transform-gpu flex items-center justify-center shrink-0 pointer-events-auto touch-pan-y ${isDragging ? 'opacity-30 grayscale' : 'opacity-100'}`} 
                   style={{ 
                     transform: `scale(${baseScale})`, 
                     transformOrigin: 'top center', 
                     marginTop: isMobile ? '20px' : '40px', 
-                    marginBottom: isMobile ? '120px' : '80px' 
+                    marginBottom: isMobile ? '120px' : '80px',
+                    touchAction: 'pan-y'
                   }}
                 >
                   <ResumePreview formData={formData} ref={resumeRef} isDarkMode={isDarkMode} paneWidth={isMobile ? 20 : (100 - leftWidth)} focusedPage={focusedPage} setFocusedPage={setFocusedPage} setTotalPages={setTotalPages} containerHeight={windowSize.height - 56} scale={baseScale} marginTop={40} />
