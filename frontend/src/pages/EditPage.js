@@ -214,8 +214,10 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const currentPaneWidth = isMobile ? 20 : (100 - leftWidth);
   const cols = currentPaneWidth > 75 ? 4 : (currentPaneWidth > 55 ? 3 : (currentPaneWidth > 30 ? 2 : 1));
   const rows = totalPages ? Math.ceil(totalPages / cols) : 1;
-  const scaledWidth = (cols * a4WidthPx + (cols - 1) * gapPx) * baseScale;
-  const scaledHeight = (rows * a4HeightPx + (rows - 1) * gapPx) * baseScale;
+  
+  // 아이패드/모바일 소수점 픽셀 떨림 방지를 위한 정수화
+  const scaledWidth = Math.ceil((cols * a4WidthPx + (cols - 1) * gapPx) * baseScale);
+  const scaledHeight = Math.ceil((rows * a4HeightPx + (rows - 1) * gapPx) * baseScale);
 
   const transitionClass = isResizing 
     ? "transition-none" 
