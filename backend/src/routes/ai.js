@@ -25,4 +25,7 @@ router.post("/audit", aiController.auditResumeContent);
 // AI JD 매칭 엔드포인트 (신규)
 router.post("/match-jd", authMiddleware, aiController.matchJD);
 
+// AI 맞춤형 자소서 생성 엔드포인트 (신규)
+router.post("/generate-cover-letter", authMiddleware, aiController.generateCoverLetter);
+
 module.exports = router;

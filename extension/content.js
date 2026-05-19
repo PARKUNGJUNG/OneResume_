@@ -93,8 +93,10 @@ fetchResumeDataFromBg();
 const removeEngineUI = () => {
   const overlay = document.getElementById('or-magic-overlay');
   const fab = document.getElementById('or-magic-fab-container');
+  const aiWidget = document.getElementById('or-ai-widget-container');
   if (overlay) overlay.remove();
   if (fab) fab.remove();
+  if (aiWidget) aiWidget.remove();
 };
 
 /**
@@ -498,10 +500,214 @@ const initSmartEngine = () => {
     
     if (siteName && window.self === window.top) {
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => { createOverlay(siteName, themeColor); createFAB(); });
+        document.addEventListener('DOMContentLoaded', () => { 
+          createOverlay(siteName, themeColor); 
+          createFAB(); 
+          createAIWidget();
+        });
       } else {
-        setTimeout(() => { createOverlay(siteName, themeColor); createFAB(); }, 500);
+        setTimeout(() => { 
+          createOverlay(siteName, themeColor); 
+          createFAB(); 
+          createAIWidget();
+        }, 500);
       }
     }
+  } catch (e) {}
+};
+
+const extractJDText = () => {
+  const host = window.location.hostname;
+  let text = `[공고 URL]: ${window.location.href}\n\n`;
+  try {
+    let extracted = "";
+    if (host.includes('saramin.co.kr')) {
+      const container = document.querySelector('.wrap_jv_cont, .cont_info, .jv_summary, .wrap_jview');
+      if (container) extracted = container.innerText;
+    } else if (host.includes('jobkorea.co.kr')) {
+      const container = document.querySelector('.artReadJobSum, .stContainer, .artReadTxt, .tbRow');
+      if (container) extracted = container.innerText;
+    }
+    
+    if (!extracted || extracted.trim().length < 50) {
+      extracted = document.body.innerText;
+    }
+    text += extracted;
+  } catch (e) {
+    text += document.body.innerText;
+  }
+  return text.substring(0, 8000);
+};
+
+const createAIWidget = () => {
+  if (document.getElementById('or-ai-widget-container')) return;
+  try {
+    const container = document.createElement('div');
+    container.id = 'or-ai-widget-container';
+    container.innerHTML = `
+      <div id="or-ai-toggle" class="or-ai-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" /></svg>
+        <span>AI 분석</span>
+      </div>
+      <div id="or-ai-menu" class="or-ai-panel or-ai-hidden">
+        <button id="or-btn-match" class="or-ai-action-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          공고 적합도 매칭
+        </button>
+        <button id="or-btn-cover" class="or-ai-action-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          맞춤형 자소서 생성
+        </button>
+      </div>
+      <div id="or-ai-result" class="or-ai-panel or-ai-hidden">
+        <div class="or-ai-result-header">
+          <span id="or-ai-result-title">분석 결과</span>
+          <button id="or-ai-close-btn">&times;</button>
+        </div>
+        <div id="or-ai-result-content"></div>
+      </div>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #or-ai-widget-container { position: fixed; top: 120px; right: 40px; z-index: 2147483646; font-family: 'Pretendard', sans-serif; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; pointer-events: none; }
+      #or-ai-widget-container > * { pointer-events: auto; }
+      .or-ai-btn { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); color: white; padding: 10px 16px; border-radius: 20px; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
+      .or-ai-btn:hover { background: #4f46e5; border-color: #6366f1; transform: translateY(-2px); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4); }
+      .or-ai-btn:active { transform: scale(0.95); }
+      
+      .or-ai-panel { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px); border-radius: 18px; border: 1px solid rgba(255,255,255,0.15); padding: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), visibility 0.3s; transform-origin: top right; }
+      .or-ai-hidden { opacity: 0; transform: translateY(-10px) scale(0.95); visibility: hidden; pointer-events: none; position: absolute; }
+      
+      .or-ai-action-btn { background: transparent; border: none; color: white; padding: 12px 16px; text-align: left; border-radius: 12px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; gap: 10px; width: 190px; }
+      .or-ai-action-btn:hover { background: rgba(255,255,255,0.1); transform: translateX(2px); }
+      .or-ai-action-btn:active { transform: scale(0.98); }
+      
+      #or-ai-result { padding: 18px; width: 340px; color: white; display: flex; flex-direction: column; max-height: 520px; }
+      .or-ai-result-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; margin-bottom: 12px; }
+      #or-ai-result-title { font-weight: 800; font-size: 15px; color: #818cf8; display: flex; align-items: center; gap: 6px; }
+      #or-ai-close-btn { background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s; }
+      #or-ai-close-btn:hover { color: white; }
+      
+      #or-ai-result-content { overflow-y: auto; font-size: 13.5px; line-height: 1.7; padding-right: 6px; color: #cbd5e1; }
+      #or-ai-result-content::-webkit-scrollbar { width: 4px; }
+      #or-ai-result-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      .or-ai-section-title { font-weight: 800; color: white; margin-top: 14px; margin-bottom: 6px; font-size: 14px; border-left: 3px solid #6366f1; padding-left: 8px; }
+      .or-ai-score { font-size: 28px; font-weight: 900; color: #10b981; text-shadow: 0 0 15px rgba(16,185,129,0.3); }
+      .or-ai-tag { display: inline-block; background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 6px; margin: 2px; font-size: 11.5px; font-weight: 600; }
+      .or-ai-tag.matched { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+      .or-ai-tag.missing { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+      .or-loading-spinner { animation: or-spin 0.8s linear infinite; display: inline-block; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.2); border-top-color: #6366f1; border-radius: 50%; }
+      @keyframes or-spin { to { transform: rotate(360deg); } }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(container);
+
+    const toggleBtn = document.getElementById('or-ai-toggle');
+    const menu = document.getElementById('or-ai-menu');
+    const resultBox = document.getElementById('or-ai-result');
+    const closeBtn = document.getElementById('or-ai-close-btn');
+    const contentBox = document.getElementById('or-ai-result-content');
+    const titleBox = document.getElementById('or-ai-result-title');
+
+    let isMenuOpen = false;
+
+    toggleBtn.addEventListener('click', () => {
+      isMenuOpen = !isMenuOpen;
+      if (isMenuOpen) {
+        menu.classList.remove('or-ai-hidden');
+        resultBox.classList.add('or-ai-hidden');
+      } else {
+        menu.classList.add('or-ai-hidden');
+      }
+    });
+
+    closeBtn.addEventListener('click', () => {
+      resultBox.classList.add('or-ai-hidden');
+    });
+
+    const callAI = (endpoint, bodyData, renderSuccess) => {
+      chrome.storage.local.get(['oneresume_token'], (res) => {
+        if (!res.oneresume_token) {
+          alert('먼저 확장 프로그램을 연동해주세요.');
+          return;
+        }
+        const token = atob(res.oneresume_token);
+
+        menu.classList.add('or-ai-hidden');
+        resultBox.classList.remove('or-ai-hidden');
+        
+        contentBox.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; padding: 40px 0;"><div class="or-loading-spinner"></div><div style="margin-top:15px; color:#94a3b8; font-weight:600;">AI가 분석 중입니다...</div></div>';
+
+        chrome.runtime.sendMessage({
+          action: "CALL_AI_API",
+          endpoint: endpoint,
+          token: token,
+          body: bodyData
+        }, (response) => {
+          if (chrome.runtime.lastError || !response || !response.success) {
+            contentBox.innerHTML = `<div style="color:#ef4444; padding:20px; text-align:center;">오류가 발생했습니다:<br>${response ? response.error : '네트워크 오류'}</div>`;
+            return;
+          }
+          renderSuccess(response.data);
+        });
+      });
+    };
+
+    document.getElementById('or-btn-match').addEventListener('click', () => {
+      titleBox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 공고 적합도 매칭`;
+      const jdText = extractJDText();
+      callAI('/api/ai/match-jd', { jdText }, (data) => {
+        let html = `
+          <div style="text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 14px;">
+            <div style="font-size:12px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Match Score</div>
+            <div class="or-ai-score">${data.score}점</div>
+          </div>
+          <div class="or-ai-section-title">일치하는 역량</div>
+          <div style="margin-bottom:10px;">${data.matchedKeywords?.map(k => `<span class="or-ai-tag matched">${k}</span>`).join('') || '-'}</div>
+          <div class="or-ai-section-title">부족한 역량</div>
+          <div style="margin-bottom:10px;">${data.missingKeywords?.map(k => `<span class="or-ai-tag missing">${k}</span>`).join('') || '-'}</div>
+          <div class="or-ai-section-title">AI 개선 팁</div>
+          <ul style="padding-left: 18px; margin-top: 8px;">
+            ${data.improvementTips?.map(t => `<li style="margin-bottom:8px; color:#cbd5e1;">${t}</li>`).join('') || ''}
+          </ul>
+        `;
+        contentBox.innerHTML = html;
+      });
+    });
+
+    document.getElementById('or-btn-cover').addEventListener('click', () => {
+      titleBox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> 맞춤형 자소서 생성`;
+      const jdText = extractJDText();
+      callAI('/api/ai/generate-cover-letter', { jdText }, (data) => {
+        let html = `
+          <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15)); border: 1px solid rgba(99, 102, 241, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 13px;">
+            <strong style="color:#a5b4fc; display:block; margin-bottom:4px;">💡 AI 작성 전략:</strong> ${data.summary}
+          </div>
+          <div class="or-ai-section-title">1. 지원동기</div>
+          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 12px; white-space: pre-wrap; font-size:13px;">${data.motivation}</div>
+          <div class="or-ai-section-title">2. 직무 역량</div>
+          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 12px; white-space: pre-wrap; font-size:13px;">${data.competency}</div>
+          <div class="or-ai-section-title">3. 성장과정/성격</div>
+          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 12px; white-space: pre-wrap; font-size:13px;">${data.character}</div>
+          <button id="or-copy-cover" style="width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: all 0.2s;">본문 전체 복사하기</button>
+        `;
+        contentBox.innerHTML = html;
+        
+        const copyBtn = document.getElementById('or-copy-cover');
+        copyBtn.addEventListener('click', (e) => {
+          const textToCopy = `[지원동기]\n${data.motivation}\n\n[직무 역량]\n${data.competency}\n\n[성장과정/성격]\n${data.character}`;
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            copyBtn.innerText = "✨ 복사 완료!";
+            copyBtn.style.background = "#10b981";
+            setTimeout(() => {
+              copyBtn.innerText = "본문 전체 복사하기";
+              copyBtn.style.background = "#4f46e5";
+            }, 2500);
+          });
+        });
+      });
+    });
+
   } catch (e) {}
 };

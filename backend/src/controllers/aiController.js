@@ -174,3 +174,100 @@ exports.matchJD = async (req, res) => {
     });
   }
 };
+
+// [신규] 공고 맞춤형 자소서 생성 API
+exports.generateCoverLetter = async (req, res) => {
+  try {
+    const { jdText } = req.body;
+    const userId = req.user.id;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!jdText || jdText.trim().length < 10) {
+      return res.status(400).json({ message: "채용 공고 내용을 입력해 주세요." });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        resumes: {
+          take: 1,
+          orderBy: { updatedAt: 'desc' },
+          include: {
+            projects: true,
+            workExperiences: true,
+            certifications: true
+          }
+        }
+      }
+    });
+
+    if (!user || !user.resumes || user.resumes.length === 0) {
+      return res.status(404).json({ message: "이력서 데이터가 없습니다. 먼저 이력서를 작성해 주세요." });
+    }
+
+    const resume = user.resumes[0];
+
+    const resumeText = `
+      [이름]: ${user.username}
+      [보유 기술]: ${resume.skills || "없음"}
+      [경력 사항]: ${resume.workExperiences.map(w => `${w.companyName} (${w.role}, ${w.period}): ${w.jobDescription}`).join("\n")}
+      [프로젝트]: ${resume.projects.map(p => `${p.name} (${p.role}): ${p.description} (기술: ${p.techStack})`).join("\n")}
+      [자격증/수상]: ${resume.certifications.map(c => `${c.name} (${c.issuer}, ${c.date})`).join("\n")}
+      [기존 자기소개서 - 성장과정]: ${resume.selfIntroGrowth || ""}
+      [기존 자기소개서 - 성격의 장단점]: ${resume.selfIntroCharacter || ""}
+      [기존 자기소개서 - 지원동기 및 포부]: ${resume.selfIntroMotivation || ""}
+    `;
+
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+
+    const prompt = `
+      당신은 수많은 합격자를 배출한 취업 전문 컨설턴트입니다.
+      사용자의 [기존 이력서 정보]와 제공된 [채용 공고(JD)]를 분석하여, 이 공고에 완벽하게 맞춤화된 자기소개서 초안을 작성해주세요.
+
+      [채용 공고]:
+      "${jdText}"
+
+      [사용자 이력서 정보]:
+      "${resumeText}"
+
+      [작성 가이드라인]:
+      1. 지원동기, 직무 역량, 성장과정/성격 등 3가지 필수 문항으로 나누어 작성하세요.
+      2. 공고(JD)에서 요구하는 핵심 키워드나 기술 스택이 사용자의 경험(프로젝트, 경력)에 있다면 그 경험을 강력하게 어필하세요.
+      3. STAR 기법(Situation, Task, Action, Result)을 활용하여 구체적이고 전문적인 어휘를 사용하세요.
+      4. 문체는 정중하고 자신감 있는 '~습니다/합니다' 체를 사용하세요.
+      5. 각 항목은 300~500자 분량으로 작성하세요.
+
+      [답변 형식 (반드시 JSON으로만 답변하세요)]:
+      {
+        "motivation": "해당 기업/직무 지원동기 초안",
+        "competency": "해당 직무에 부합하는 본인의 핵심 역량과 경험 어필 초안",
+        "character": "성장과정 또는 성격의 장단점을 활용한 조직 적합성 어필 초안",
+        "summary": "이 자소서 초안의 작성 전략 요약 (어떤 부분을 강조했는지 1~2줄 설명)"
+      }
+    `;
+
+    const response = await axios.post(apiUrl, {
+      contents: [{
+        parts: [{ text: prompt }]
+      }]
+    });
+
+    const responseText = response.data.candidates[0].content.parts[0].text;
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    
+    if (!jsonMatch) {
+      throw new Error("AI 분석 결과 형식이 올바르지 않습니다.");
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+    res.json(result);
+
+  } catch (error) {
+    console.error("Generate Cover Letter Error:", error.message);
+    res.status(500).json({ 
+      message: "맞춤형 자소서 생성 중 오류가 발생했습니다.",
+      error: error.message 
+    });
+  }
+};
+

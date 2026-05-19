@@ -16,6 +16,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; 
   }
 
+  if (request.action === "CALL_AI_API") {
+    fetch(`https://api.oneresume.kr${request.endpoint}`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${request.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(request.body)
+    })
+    .then(async response => {
+      if (!response.ok) {
+        let errMsg = "Server responded with status: " + response.status;
+        try {
+          const errData = await response.json();
+          if (errData.message) errMsg = errData.message;
+        } catch(e) {}
+        throw new Error(errMsg);
+      }
+      return response.json();
+    })
+    .then(data => {
+      sendResponse({ success: true, data: data });
+    })
+    .catch(error => {
+      sendResponse({ success: false, error: error.message });
+    });
+    return true;
+  }
+
   // 모든 프레임으로 데이터 전파 (Broadcast)
   if (request.action === "BROADCAST_RESUME_DATA" && sender.tab) {
     chrome.webNavigation.getAllFrames({ tabId: sender.tab.id }, (frames) => {
