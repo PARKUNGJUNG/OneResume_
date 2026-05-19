@@ -225,27 +225,27 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
 
   return (
     <PageLayout isDarkMode={isDarkMode} noPadding={true}>
-      <header className={`h-14 px-4 md:px-6 border-b flex items-center justify-between z-40 print:hidden ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
-        <div className="flex items-center gap-3 md:gap-4 flex-shrink-0 mr-4">
-          <div className="flex items-center gap-2 md:gap-2.5 flex-shrink-0">
+      <header className={`h-14 px-3 md:px-6 border-b flex items-center justify-between z-40 print:hidden ${isDarkMode ? 'bg-zinc-950/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0 mr-2">
+          <div className="flex items-center gap-1.5 md:gap-2.5 flex-shrink-0">
             <img 
               src={logo} 
               alt="OneResume Logo" 
               onClick={() => window.location.reload()}
-              className="w-7 h-7 md:w-8 md:h-8 object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110 active:scale-95" 
+              className="w-6 h-6 md:w-8 md:h-8 object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110 active:scale-95" 
               title="편집 페이지 새로고침"
             />
-            <div className="flex items-end gap-1.5 whitespace-nowrap">
+            <div className="flex items-end gap-1 whitespace-nowrap">
               <h1 
                 onClick={() => window.location.reload()}
-                className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter cursor-pointer transition-colors ${isDarkMode ? 'text-white hover:text-blue-400' : 'text-zinc-800 hover:text-blue-600'}`}
+                className={`text-[0.9rem] md:text-[1.2rem] font-black tracking-tighter cursor-pointer transition-colors ${isDarkMode ? 'text-white hover:text-blue-400' : 'text-zinc-800 hover:text-blue-600'}`}
                 title="편집 페이지 새로고침"
               >
                 OneResume
               </h1>
               <button 
                 onClick={() => navigate('/setup-profile', { state: { step: 2 } })}
-                className={`text-[0.9rem] md:text-[1.1rem] font-black tracking-tighter transition-all hover:scale-105 active:scale-95 hover:underline underline-offset-4 cursor-pointer ${(() => {
+                className={`text-[0.85rem] md:text-[1.1rem] font-black tracking-tighter transition-all hover:scale-105 active:scale-95 hover:underline underline-offset-4 cursor-pointer ${(() => {
                   const colorMap = {
                     developer: isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700',
                     it: isDarkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700',
@@ -368,64 +368,49 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
               </div>
             </div>
 
-            {/* 프로필 토글 버튼 (완벽한 수평 정렬을 위한 픽셀 튜닝) */}
-            <div className="relative flex-shrink-0 flex items-center h-9">
+            {/* 프로필 토글 버튼 (긴급 수정: 터짐 방지 및 정렬 최적화) */}
+            <div className="relative flex-shrink-0 flex items-center">
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`group flex items-center h-9 gap-2.5 px-3 rounded-xl border-2 transition-all active:scale-95 shadow-sm antialiased ${
+                className={`group flex items-center h-9 gap-2 px-2.5 rounded-full border-2 transition-all active:scale-95 shadow-sm ${
                   isMenuOpen 
                     ? 'border-blue-500 bg-blue-500/5 ring-4 ring-blue-500/10' 
-                    : (isDarkMode ? 'bg-zinc-800 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/80' : 'bg-white border-zinc-200 hover:border-blue-300 hover:bg-zinc-50')
+                    : (isDarkMode ? 'bg-zinc-800 border-zinc-700 hover:border-zinc-500' : 'bg-white border-zinc-200 hover:border-blue-300')
                 }`}
               >
-                {/* 아바타 영역 (24px로 고정하여 h-9 내에서 완벽한 수직 중앙 정렬) */}
-                <div className={`w-6 h-6 rounded-full overflow-hidden border shadow-inner flex-shrink-0 ${isDarkMode ? 'border-zinc-700 bg-zinc-900' : 'border-zinc-100 bg-zinc-50'}`}>
+                {/* 아바타 영역 (고정 크기 강제) */}
+                <div className="w-6 h-6 rounded-full overflow-hidden border shadow-inner flex-shrink-0 bg-zinc-100 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700">
                   {formData.profileImageUrl ? (
                     <img src={formData.profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
-                    <div className={`w-full h-full flex items-center justify-center ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                    <div className="w-full h-full flex items-center justify-center text-zinc-400 dark:text-zinc-500">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                     </div>
                   )}
                 </div>
 
-                {/* 이름 및 소셜 로고 영역 */}
-                <div className="flex items-center gap-2 h-full">
-                  <span className={`text-[12px] font-black tracking-tighter leading-none ${isDarkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>
+                {/* 이름 및 소셜 로고 (이름은 모바일에서 숨김) */}
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <span className={`hidden sm:inline text-[12px] font-black tracking-tighter ${isDarkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>
                     {formData.username || '사용자'}
                   </span>
                   
-                  {/* 소셜 로그인 로고 뱃지 */}
                   {formData.provider && formData.provider !== 'LOCAL' && (
-                    <div className="flex items-center h-full">
+                    <div className="flex items-center flex-shrink-0">
                       {formData.provider === 'KAKAO' && (
-                        <div className="w-3.5 h-3.5 bg-[#FEE500] rounded-[3px] flex items-center justify-center shadow-[0_0.5px_2px_rgba(0,0,0,0.1)]">
+                        <div className="w-3.5 h-3.5 bg-[#FEE500] rounded-full flex items-center justify-center shadow-sm">
                           <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 text-[#3C1E1E]" fill="currentColor">
                             <path d="M12 3C7.029 3 3 6.129 3 10.129c0 2.59 1.676 4.88 4.232 6.13l-1.077 3.96c-.083.303.326.541.53.37l4.67-3.111c.532.062 1.078.093 1.645.093 4.971 0 9-3.129 9-7.129C21 6.129 16.971 3 12 3z" />
                           </svg>
                         </div>
                       )}
                       {formData.provider === 'NAVER' && (
-                        <div className="w-3.5 h-3.5 bg-[#03C75A] rounded-[3px] flex items-center justify-center shadow-[0_0.5px_2px_rgba(0,0,0,0.1)]">
-                          <span className="text-[7.5px] font-[1000] text-white leading-none transform -translate-y-[0.5px]">N</span>
+                        <div className="w-3.5 h-3.5 bg-[#03C75A] rounded-full flex items-center justify-center shadow-sm">
+                          <span className="text-[7.5px] font-[1000] text-white leading-none">N</span>
                         </div>
                       )}
                     </div>
                   )}
-                </div>
-
-                {/* 드롭다운 표시 아이콘 */}
-                <div className="flex items-center h-full">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    className={`w-3.5 h-3.5 transition-all duration-300 ${isMenuOpen ? 'rotate-180 text-blue-500' : 'text-zinc-400 group-hover:text-zinc-500'}`} 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor" 
-                    strokeWidth={3}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
                 </div>
               </button>
 
@@ -540,14 +525,14 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
             className={`h-full overflow-y-auto custom-scrollbar relative ${transitionClass} ${
               !isMobile ? 'border-r' : ''
             } ${
-              isDarkMode ? 'border-zinc-800 bg-zinc-900/30' : 'border-zinc-200 bg-gray-50/30'
+              isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
             }`}
           >
             <div 
               className="w-full relative origin-top-left" 
               style={{ 
                 zoom: activeZoom,
-                padding: isMobile ? '24px 20px 100px 20px' : '24px',
+                padding: isMobile ? '0 0 100px 0' : '24px',
                 minHeight: '100%'
               }}
             >
@@ -705,36 +690,36 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
 
       {/* 모바일 하단 네비게이션 탭 */}
       {isMobile && (
-        <div className={`fixed bottom-0 left-0 right-0 h-16 border-t z-[100] flex items-center px-6 gap-4 backdrop-blur-xl ${
+        <div className={`fixed bottom-0 left-0 right-0 h-14 border-t z-[100] flex items-center px-4 gap-2 backdrop-blur-xl ${
           isDarkMode ? 'bg-zinc-900/90 border-zinc-800' : 'bg-white/90 border-zinc-200 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]'
         }`}>
           <button 
             onClick={() => setActiveView('edit')}
-            className={`flex-1 flex flex-col items-center justify-center gap-1 h-12 rounded-xl transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 h-10 rounded-lg transition-all ${
               activeView === 'edit' 
                 ? 'text-blue-600 bg-blue-500/5' 
                 : 'text-zinc-400 hover:text-zinc-600'
             }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            <span className="text-[10px] font-black uppercase tracking-tighter">편집하기</span>
+            <span className="text-[9px] font-black uppercase tracking-tighter">편집하기</span>
           </button>
-          <div className="w-[1px] h-6 bg-zinc-500/10" />
+          <div className="w-[1px] h-5 bg-zinc-500/10" />
           <button 
             onClick={() => setActiveView('preview')}
-            className={`flex-1 flex flex-col items-center justify-center gap-1 h-12 rounded-xl transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 h-10 rounded-lg transition-all ${
               activeView === 'preview' 
                 ? 'text-blue-600 bg-blue-500/5' 
                 : 'text-zinc-400 hover:text-zinc-600'
             }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span className="text-[10px] font-black uppercase tracking-tighter">미리보기</span>
+            <span className="text-[9px] font-black uppercase tracking-tighter">미리보기</span>
           </button>
         </div>
       )}

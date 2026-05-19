@@ -1,6 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* --- Global App Styles --- */
+html, body {
+  background-color: #f9f9fb; /* zinc-50 */
+}
+
+.dark html, .dark body {
+  background-color: #09090b; /* zinc-950 */
+}
+
 @media print {
   /* 1. 기본 배경 및 색상 보존 설정 */
   body {

@@ -4,7 +4,7 @@ import ThemeToggle from './ThemeToggle';
 const PageLayout = ({ children, isDarkMode, toggleDarkMode, noPadding = false }) => {
   return (
     <div className={`relative min-h-screen w-full flex flex-col transition-colors duration-300 overflow-x-hidden overflow-y-auto ${
-      isDarkMode ? 'bg-zinc-900' : 'bg-gray-50'
+      isDarkMode ? 'bg-zinc-950' : 'bg-zinc-50'
     }`}>
       {/* 장식용 배경 원형 */}
       <div className={`w-[500px] h-[500px] fixed -right-20 -top-28 rounded-full blur-[80px] transition-all duration-500 pointer-events-none opacity-50 ${
