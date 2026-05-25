@@ -5,6 +5,10 @@
 /* --- Global App Styles --- */
 html, body {
   background-color: #f9f9fb; /* zinc-50 */
+  transition: 
+    background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1), 
+    color 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark html, .dark body {
