@@ -75,13 +75,9 @@ function App() {
         position="top-center"
         reverseOrder={false}
         toastOptions={{
+          className: 'oneresume-toast',
           style: {
             borderRadius: '16px',
-            padding: '16px 24px',
-            fontSize: '1.1rem',
-            maxWidth: '500px',
-            fontWeight: '600',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
             // 실시간 isDarkMode 상태 반영
             background: isDarkMode ? '#1e293b' : '#ffffff', // slate-800 : white
             color: isDarkMode ? '#f8fafc' : '#1e293b',      // slate-50 : slate-800

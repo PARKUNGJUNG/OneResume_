@@ -185,19 +185,19 @@ const ResumeForm = ({
     };
 
     return (
-      <div className="flex flex-col gap-3 pt-6 md:pt-12 mt-6 md:mt-12 border-t border-zinc-500/10 w-full">
+      <div className="hidden lg:flex flex-col gap-3 pt-6 md:pt-8 mt-6 md:mt-8 border-t border-zinc-500/10 w-full">
         {/* Row 1: Navigation Row */}
         <div className="flex flex-row items-center gap-2 md:gap-3 w-full">
           {!isFirst && (
             <button 
               type="button" 
               onClick={() => { setActiveTab(tabs[activeIndex - 1].id); scrollToTop(); }}
-              className={`flex-none md:flex-1 px-3.5 md:px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[13px] md:text-sm transition-all border flex items-center justify-center gap-1.5 active:scale-95 group ${
+              className={`${isSpecialTab ? 'flex-none md:flex-1' : 'flex-1'} px-3.5 md:px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[13px] md:text-sm transition-all border flex items-center justify-center gap-1.5 active:scale-95 group ${
                 isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-zinc-200 text-zinc-600 shadow-sm hover:bg-zinc-50'
               }`}
             >
               <svg className="w-4 h-4 md:w-5 md:h-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M15 19l-7-7 7-7" /></svg>
-              <span className="hidden sm:inline">이전</span>
+              <span className={isSpecialTab ? "hidden sm:inline" : ""}>이전</span>
             </button>
           )}
 
@@ -205,17 +205,17 @@ const ResumeForm = ({
             <button 
               type="button" 
               onClick={handleSubmit}
-              className={`flex-1 ${isSpecialTab ? 'md:flex-1' : 'md:hidden'} py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[13px] md:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 hover:scale-[1.02]`}
+              className={`flex-1 px-3.5 md:px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[12.5px] md:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 hover:scale-[1.02] ${isSpecialTab ? 'md:flex-1' : ''}`}
             >
               <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-              <span>이력서 저장</span>
+              <span className={isSpecialTab ? "" : "whitespace-nowrap"}>이력서 저장</span>
             </button>
           )}
 
           <button 
             type={isLast ? "submit" : "button"}
             onClick={isLast ? handleSubmit : () => { setActiveTab(tabs[activeIndex + 1].id); scrollToTop(); }}
-            className={`flex-[2] md:flex-1 px-3.5 md:px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black shadow-lg transition-all flex items-center justify-center gap-1.5 group text-[13px] md:text-sm active:scale-95 hover:scale-[1.02] ${
+            className={`${isSpecialTab ? 'flex-[2] md:flex-1' : 'flex-1'} px-3.5 md:px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black shadow-lg transition-all flex items-center justify-center gap-1.5 group text-[13px] md:text-sm active:scale-95 hover:scale-[1.02] ${
               isLast 
                 ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-500/20' 
                 : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-600/20'
@@ -235,18 +235,6 @@ const ResumeForm = ({
             )}
           </button>
         </div>
-
-        {/* Row 2: Desktop Full-width Save Button for non-special tabs */}
-        {!isSpecialTab && !isLast && (
-          <button 
-            type="button" 
-            onClick={handleSubmit}
-            className="hidden md:flex w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-xl md:rounded-2xl shadow-xl shadow-emerald-500/20 text-sm lg:text-base items-center justify-center gap-2 transition-all active:scale-[0.98] hover:scale-[1.02]"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-            이력서 저장
-          </button>
-        )}
       </div>
     );
   };

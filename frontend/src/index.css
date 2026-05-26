@@ -124,3 +124,55 @@ html, body {
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
 }
+
+/* --- Custom Toast Styles (React-Hot-Toast) --- */
+/* 1. PC 기본 스타일 (기존 디자인 보존) */
+.oneresume-toast {
+  font-size: 1.1rem !important;
+  padding: 16px 24px !important;
+  max-width: 500px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 2. 모바일/태블릿 스타일 (스마트폰 시스템 알림 극소화) */
+@media (max-width: 768px) {
+  body > div:last-child > div,
+  #toaster {
+    top: 12px !important;
+    bottom: auto !important;
+  }
+
+  .oneresume-toast {
+    min-width: 0 !important;
+    width: max-content !important;
+    max-width: 90vw !important;
+    font-size: 15px !important; /* 가독성을 위해 조금 더 키움 */
+    padding: 12px 22px !important;
+    border-radius: 16px !important; /* PC와 동일한 라운드 값 적용 */
+    margin: 0 auto !important;
+    font-weight: 700 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15) !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  /* 아이콘 스타일 정밀 보정 */
+  .oneresume-toast > div:first-child {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .oneresume-toast svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
