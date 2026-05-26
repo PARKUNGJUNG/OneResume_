@@ -172,14 +172,22 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
       const currentScroll = e.target.scrollTop;
       const delta = currentScroll - lastScrollTop.current;
       
+      // 최상단 근처에서는 항상 보여줌
+      if (currentScroll < 50) {
+        setShowBottomBar(true);
+        scrollAccumulator.current = 0;
+        lastScrollTop.current = currentScroll;
+        return;
+      }
+
       if (delta > 0) {
-        // 스크롤 내리는 중 (숨기기 - 둔감하게)
+        // 스크롤 내리는 중 (숨기기)
         scrollAccumulator.current += delta;
-        if (scrollAccumulator.current > 250) {
+        if (scrollAccumulator.current > 150) { // 감도를 250에서 150으로 조정
           setShowBottomBar(false);
         }
-      } else {
-        // 스크롤 올리는 중 (보여주기 - 즉각적으로)
+      } else if (delta < -10) { // 미세한 떨림 방지
+        // 스크롤 올리는 중 (보여주기)
         setShowBottomBar(true);
         scrollAccumulator.current = 0;
       }
@@ -289,7 +297,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                       {formData.profileImageUrl ? <img src={formData.profileImageUrl} alt="Profile" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-zinc-400 dark:text-zinc-500"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>}
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className={`hidden sm:inline text-[12px] font-black tracking-tighter ${isDarkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>{formData.username || '사용자'}</span>
+                      <span className={`text-[12px] font-black tracking-tighter ${isDarkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>{formData.username || '사용자'}</span>
                       {formData.provider && formData.provider !== 'LOCAL' && (
                         <div className="flex items-center flex-shrink-0">
                           {formData.provider === 'KAKAO' && <div className="w-3.5 h-3.5 bg-[#FEE500] rounded-full flex items-center justify-center shadow-sm"><svg viewBox="0 0 24 24" className="w-2.5 h-2.5 text-[#3C1E1E]" fill="currentColor"><path d="M12 3C7.029 3 3 6.129 3 10.129c0 2.59 1.676 4.88 4.232 6.13l-1.077 3.96c-.083.303.326.541.53.37l4.67-3.111c.532.062 1.078.093 1.645.093 4.971 0 9-3.129 9-7.129C21 6.129 16.971 3 12 3z" /></svg></div>}
