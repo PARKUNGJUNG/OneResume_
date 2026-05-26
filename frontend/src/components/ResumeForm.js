@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { motion, AnimatePresence } from "framer-motion";
 import DaumPostcode from "react-daum-postcode";
 import toast from "react-hot-toast";
 
@@ -27,7 +28,10 @@ const ResumeForm = ({
   onlyLayout = false
 }) => {
   const [activeTab, setActiveTab] = useState('basic');
+  const [direction, setDirection] = useState(0); // -1: left, 1: right
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [isAddressOpen, setIsAddressOpen] = useState(false);
+  // ... rest of state ...
   const [schoolResults, setSchoolResults] = useState([]);
   const [majorResults, setMajorResults] = useState([]);
   const [jobResults, setJobResults] = useState([]);
@@ -39,6 +43,88 @@ const ResumeForm = ({
 
   const [aiFeedback, setAiFeedback] = useState(null);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const tabContainerRef = React.useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 활성 탭이 바뀔 때 해당 탭이 화면 중앙으로 오도록 스크롤
+  useEffect(() => {
+    if (tabContainerRef.current) {
+      const activeTabElement = tabContainerRef.current.querySelector(`[data-tab-id="${activeTab}"]`);
+      if (activeTabElement) {
+        activeTabElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+  }, [activeTab]);
+
+  const switchTab = (newTabId) => {
+    if (activeTab === newTabId) return;
+    const newIndex = tabs.findIndex(t => t.id === newTabId);
+    setDirection(newIndex > activeIndex ? 1 : -1);
+    setActiveTab(newTabId);
+    
+    // 모바일에서 섹션 이동 시 상단으로 스크롤
+    const container = document.querySelector('.custom-scrollbar');
+    if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSwipe = (event, info) => {
+    if (!isMobile) return;
+    const swipeThreshold = 50;
+    if (info.offset.x < -swipeThreshold && activeIndex < tabs.length - 1) {
+      switchTab(tabs[activeIndex + 1].id);
+    } else if (info.offset.x > swipeThreshold && activeIndex > 0) {
+      switchTab(tabs[activeIndex - 1].id);
+    }
+  };
+
+  const variants = {
+    enter: (direction) => ({
+      x: isMobile 
+        ? (direction > 0 ? '100%' : '-100%') // 모바일: 인스타 스타일 슬라이드
+        : (direction > 0 ? '10%' : '-10%'),   // PC: 시네마틱 오프셋
+      opacity: isMobile ? 1 : 0,               // 모바일은 불투명도 유지(슬라이드 집중)
+      scale: isMobile ? 1 : 0.96,              // PC만 스케일 효과
+      filter: isMobile ? 'blur(0px)' : 'blur(8px)',
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      filter: 'blur(0px)',
+      transition: {
+        x: { type: "spring", stiffness: 500, damping: 45, mass: 0.8 }, // 훨씬 빠릿빠릿한 반응성
+        opacity: { duration: 0.2 },
+        filter: { duration: 0.2 },
+        scale: { type: "spring", stiffness: 400, damping: 30 }
+      }
+    },
+    exit: (direction) => ({
+      x: isMobile 
+        ? (direction < 0 ? '100%' : '-100%')
+        : (direction < 0 ? '10%' : '-10%'),
+      opacity: isMobile ? 1 : 0,
+      scale: isMobile ? 1 : 0.96,
+      filter: isMobile ? 'blur(0px)' : 'blur(8px)',
+      position: 'absolute', // 나가는 요소가 레이아웃을 차지하지 않도록 설정
+      top: 0,
+      left: 0,
+      right: 0,
+      transition: {
+        x: { type: "spring", stiffness: 500, damping: 45, mass: 0.8 },
+        opacity: { duration: 0.2 },
+        filter: { duration: 0.2 }
+      }
+    })
+  };
 
   const theme = {
     formBg: isDarkMode ? "bg-zinc-950 lg:bg-zinc-900 border-zinc-900 lg:border-zinc-800" : "bg-zinc-200/40 lg:bg-zinc-200/20 border-zinc-300",
@@ -191,7 +277,7 @@ const ResumeForm = ({
           {!isFirst && (
             <button 
               type="button" 
-              onClick={() => { setActiveTab(tabs[activeIndex - 1].id); scrollToTop(); }}
+              onClick={() => switchTab(tabs[activeIndex - 1].id)}
               className={`${isSpecialTab ? 'flex-none md:flex-1' : 'flex-1'} px-3.5 md:px-5 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[13px] md:text-sm transition-all border flex items-center justify-center gap-1.5 active:scale-95 group ${
                 isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-zinc-200 text-zinc-600 shadow-sm hover:bg-zinc-50'
               }`}
@@ -344,7 +430,7 @@ const ResumeForm = ({
       {/* Sticky Tab Bar (Native App Top Tabs style) */}
       <div className={`flex-none sticky top-0 z-40 border-b border-zinc-500/10 overflow-x-auto hide-scrollbar p-1.5 backdrop-blur-xl ${
         isDarkMode ? 'bg-zinc-900/80' : 'bg-white/80'
-      }`}>
+      }`} ref={tabContainerRef}>
         <div className="flex w-max min-w-full gap-1 relative">
           <div 
             className="absolute top-0 bottom-0 bg-blue-600 rounded-xl shadow-lg transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] z-0" 
@@ -356,7 +442,8 @@ const ResumeForm = ({
           {tabs.map((tab, idx) => (
             <button 
               key={tab.id} 
-              onClick={() => setActiveTab(tab.id)} 
+              data-tab-id={tab.id}
+              onClick={() => switchTab(tab.id)} 
               className={`flex-1 min-w-[85px] sm:min-w-[110px] flex items-center justify-center gap-2 rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 py-2.5 sm:py-3 px-3 relative z-10 ${
                 activeTab === tab.id 
                   ? 'text-white' 
@@ -371,31 +458,82 @@ const ResumeForm = ({
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3.5 md:p-6 lg:p-8">
-        <div className="max-w-[1400px] mx-auto space-y-4 md:space-y-8">
+        <div className="max-w-[1400px] mx-auto space-y-4 md:space-y-8 overflow-hidden">
           <DragDropContext onDragStart={onDragStart} onDragEnd={handleDragEnd}>
-            {activeTab === 'basic' && (
-              <div className="space-y-4 md:space-y-8 animate-fade-in">
+            <div className="relative">
+              <AnimatePresence mode="popLayout" custom={direction} initial={false}>
+                <motion.div
+                  key={activeTab}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  drag={isMobile ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={1} // 손가락을 1:1로 따라오도록 변경
+                  onDragEnd={handleSwipe}
+                  className="w-full"
+                >
+                  {activeTab === 'basic' && (
+                  <div className="space-y-4 md:space-y-8">
                 <div className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border transition-all ${theme.cardBg}`}>
                   <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
-                    <div className="shrink-0 mx-auto md:mx-0 text-center group">
+                    <div className="shrink-0 mx-auto md:mx-0 text-center flex flex-col items-center">
                       <div className="w-[90px] md:w-[120px] h-[120px] md:h-[160px] rounded-xl md:rounded-2xl overflow-hidden border-2 shadow-xl bg-white dark:bg-zinc-900 border-white dark:border-zinc-700 relative">
                         {formData.profileImageUrl ? <img src={formData.profileImageUrl} alt="프로필" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-zinc-300"><svg className="h-10 w-10 md:h-16 md:w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>}
                       </div>
-                      <label className="mt-3 md:mt-4 inline-flex cursor-pointer px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
-                        <span className="text-[10px] md:text-[11px] font-black uppercase flex items-center gap-1.5">
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                          사진 변경
-                        </span>
-                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                      </label>
+                      <div className="mt-3 md:mt-4">
+                        <label className="inline-flex cursor-pointer px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+                          <span className="text-[10px] md:text-[11px] font-black uppercase flex items-center gap-1.5">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            사진 변경
+                          </span>
+                          <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                        </label>
+                      </div>
                     </div>
                     <div className="flex-1 w-full grid gap-3.5 md:gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 md:gap-5">
-                        <div className="flex flex-col gap-1.5"><label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>이름 *</label><input type="text" name="username" value={formData.username || ""} onChange={handleChange} placeholder="홍길동" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} /></div>
-                        <div className="flex flex-col gap-1.5"><label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>성별</label><div className={`relative flex p-1 rounded-lg md:rounded-xl border ${theme.innerInputBg} h-[44px] md:h-[48px]`}><div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md md:rounded-lg transition-all duration-500 shadow-sm ${formData.gender === 'male' ? 'left-1 bg-blue-600' : (formData.gender === 'female' ? 'left-[calc(50%)] bg-pink-500' : 'opacity-0')}`} /><button type="button" onClick={() => handleChange({ target: { name: 'gender', value: 'male' } })} className={`relative z-10 flex-1 flex items-center justify-center text-[10px] md:text-[11px] font-black ${formData.gender === 'male' ? 'text-white' : 'text-zinc-500'}`}>남성</button><button type="button" onClick={() => handleChange({ target: { name: 'gender', value: 'female' } })} className={`relative z-10 flex-1 flex items-center justify-center text-[10px] md:text-[11px] font-black ${formData.gender === 'female' ? 'text-white' : 'text-zinc-500'}`}>여성</button></div></div>
-                        <div className="flex flex-col gap-1.5"><div className="flex items-center justify-between pl-1"><label className={`text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>나이</label><label className="flex items-center gap-2 cursor-pointer group"><input type="checkbox" name="useInternationalAge" checked={formData.useInternationalAge || false} onChange={handleChange} className="sr-only peer" /><div className={`w-4 h-4 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${isDarkMode ? 'bg-zinc-800 border-zinc-700 peer-checked:bg-blue-600 peer-checked:border-blue-600' : 'bg-white border-zinc-300 peer-checked:bg-blue-600 peer-checked:border-blue-600'}`}><svg className={`w-2.5 h-2.5 text-white transition-transform duration-200 ${formData.useInternationalAge ? 'scale-100' : 'scale-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div><span className={`text-[10px] md:text-[11px] font-black transition-colors ${isDarkMode ? 'text-zinc-300 group-hover:text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-700'}`}>만 나이</span></label></div><input type="number" name="age" value={formData.age || ""} onChange={handleChange} placeholder="숫자" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} /></div>
+                      {/* 모바일: 3열(이름/성별/나이) / PC: 2~3열 가변 */}
+                      <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-5 items-end">
+                        <div className="flex flex-col gap-1.5">
+                          <label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>이름 *</label>
+                          <input type="text" name="username" value={formData.username || ""} onChange={handleChange} placeholder="홍길동" className={`w-full px-2.5 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[13px] md:text-base ${theme.innerInputBg} h-[44px] md:h-[48px]`} />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>성별</label>
+                          <div className={`relative flex p-1 rounded-lg md:rounded-xl border ${theme.innerInputBg} h-[44px] md:h-[48px] box-border`}>
+                            <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md md:rounded-lg transition-all duration-500 shadow-sm ${formData.gender === 'male' ? 'left-1 bg-blue-600' : (formData.gender === 'female' ? 'left-[calc(50%)] bg-pink-500' : 'opacity-0')}`} />
+                            <button type="button" onClick={() => handleChange({ target: { name: 'gender', value: 'male' } })} className={`relative z-10 flex-1 flex items-center justify-center text-[10px] md:text-[12px] font-black ${formData.gender === 'male' ? 'text-white' : 'text-zinc-500'}`}>남성</button>
+                            <button type="button" onClick={() => handleChange({ target: { name: 'gender', value: 'female' } })} className={`relative z-10 flex-1 flex items-center justify-center text-[10px] md:text-[12px] font-black ${formData.gender === 'female' ? 'text-white' : 'text-zinc-500'}`}>여성</button>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between pl-1">
+                            <label className={`text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>나이</label>
+                            {/* 모바일에서도 체크박스 유지 */}
+                            <label className="flex items-center gap-1 cursor-pointer group">
+                              <input type="checkbox" name="useInternationalAge" checked={formData.useInternationalAge || false} onChange={handleChange} className="sr-only peer" />
+                              <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${isDarkMode ? 'bg-zinc-800 border-zinc-700 peer-checked:bg-blue-600 peer-checked:border-blue-600' : 'bg-white border-zinc-300 peer-checked:bg-blue-600 peer-checked:border-blue-600'}`}>
+                                <svg className={`w-2.5 h-2.5 text-white transition-transform duration-200 ${formData.useInternationalAge ? 'scale-100' : 'scale-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                              </div>
+                              <span className={`text-[9px] md:text-[11px] font-black transition-colors ${isDarkMode ? 'text-zinc-400 group-hover:text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-700'}`}>만 나이</span>
+                            </label>
+                          </div>
+                          <input type="number" name="age" value={formData.age || ""} onChange={handleChange} placeholder="숫자" className={`w-full px-2.5 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[13px] md:text-base ${theme.innerInputBg} h-[44px] md:h-[48px]`} />
+                        </div>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-5"><div className="flex flex-col gap-1.5"><label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>전화번호</label><input type="text" name="phone" value={formData.phone || ""} onChange={handleChange} placeholder="010-0000-0000" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} /></div><div className="flex flex-col gap-1.5"><label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>이메일</label><input type="email" name="email" value={formData.email || ""} onChange={handleChange} placeholder="example@email.com" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} /></div></div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-5">
+                        <div className="flex flex-col gap-1.5">
+                          <label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>전화번호</label>
+                          <input type="text" name="phone" value={formData.phone || ""} onChange={handleChange} placeholder="010-0000-0000" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>이메일</label>
+                          <input type="email" name="email" value={formData.email || ""} onChange={handleChange} placeholder="example@email.com" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} />
+                        </div>
+                      </div>
                       <div className="flex flex-col gap-1.5 pt-1">
                         <div className="flex justify-between items-center pl-1">
                           <label className={`text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>한 줄 소개</label>
@@ -459,9 +597,36 @@ const ResumeForm = ({
                 <div className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border ${theme.cardBg} space-y-4 md:space-y-6`}>
                   <div className="flex items-center gap-2 mb-1"><div className="w-1.5 h-3.5 md:h-4 bg-blue-600 rounded-full" /><h4 className={`text-[10px] md:text-[13px] font-black uppercase tracking-widest ${theme.labelText}`}>개인 브랜딩</h4></div>
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between pl-1"><div className="flex items-center gap-2"><label className={`text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>서브도메인</label></div></div>
-                    <div className="flex items-center"><input type="text" name="subdomain" value={formData.subdomain || ""} onChange={handleChange} placeholder="your-id" className={`flex-1 px-3.5 py-2.5 md:px-4 md:py-3 border rounded-l-lg md:rounded-l-xl outline-none border-r-0 ${theme.innerInputBg} font-black text-[14px] md:text-base`} /><span className={`px-4 md:px-5 py-2.5 md:py-3 font-black text-[11px] md:text-[13px] border border-l-0 rounded-r-lg md:rounded-r-xl ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-gray-100 border-gray-200 text-zinc-500'}`}>.oneresume.kr</span></div>
-                    <div className="pl-1 flex flex-col gap-1 pt-0.5"><div className="flex items-center gap-2"><span className={`text-[10px] md:text-[12px] font-bold ${theme.subText}`}>접속 주소 미리보기:</span><span className="text-[10px] md:text-[13px] font-black text-blue-500 underline underline-offset-4 tracking-tight">https://{formData.subdomain || "your-id"}.oneresume.kr</span></div></div>
+                    <div className="flex items-center gap-1.5 pl-1">
+                      <label className={`text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>서브도메인</label>
+                      <div className="group relative">
+                        <svg className={`w-3.5 h-3.5 cursor-help transition-colors ${isDarkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className={`absolute top-full left-0 mt-2 w-64 p-3 rounded-xl border shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] text-[11px] font-medium leading-relaxed ${isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-zinc-200 text-zinc-600'}`}>
+                          나만의 <span className="text-blue-500 font-bold">전용 이력서 주소</span>를 설정합니다.<br/>
+                          예: <span className="font-bold underline">kim-dev</span> 입력 시<br/>
+                          <span className="text-blue-500 font-black">kim-dev.oneresume.kr</span>로 접속 가능합니다.
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-stretch h-[44px] md:h-[48px]">
+                      <input 
+                        type="text" 
+                        name="subdomain" 
+                        value={formData.subdomain || ""} 
+                        onChange={handleChange} 
+                        placeholder="your-id" 
+                        className={`flex-1 min-w-0 px-3.5 md:px-4 border rounded-l-lg md:rounded-l-xl outline-none border-r-0 ${theme.innerInputBg} font-black text-[14px] md:text-base transition-all h-full`} 
+                      />
+                      <span className={`flex items-center px-4 md:px-5 font-black text-[11px] md:text-[13px] border border-l-0 rounded-r-lg md:rounded-r-xl whitespace-nowrap h-full ${
+                        isDarkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-gray-100 border-gray-200 text-zinc-500'
+                      }`}>
+                        .oneresume.kr
+                      </span>
+                    </div>
+                    <div className="pl-1 flex flex-col gap-1 pt-0.5">
+<div className="flex items-center gap-2"><span className={`text-[10px] md:text-[12px] font-bold ${theme.subText}`}>접속 주소 미리보기:</span><span className="text-[10px] md:text-[13px] font-black text-blue-500 underline underline-offset-4 tracking-tight">https://{formData.subdomain || "your-id"}.oneresume.kr</span></div></div>
                   </div>
                 </div>
                 <div className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border ${theme.cardBg} space-y-4 md:space-y-8`}><div className="flex items-center gap-2 mb-1"><div className="w-1.5 h-3.5 md:h-4 bg-blue-600 rounded-full" /><h4 className={`text-[11px] md:text-[13px] font-black uppercase tracking-widest ${theme.labelText}`}>외부 링크 연동</h4></div><div className="flex flex-col gap-2"><label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>GitHub 주소</label><div className="flex gap-2 md:gap-3"><input type="text" name="githubUrl" value={formData.githubUrl || ""} onChange={handleChange} placeholder="https://github.com/your-id" className={`flex-1 px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} />{formData.githubUrl && <button type="button" onClick={handleGithubSync} className="bg-zinc-900 dark:bg-blue-600 text-white font-black px-4 md:px-6 rounded-lg md:rounded-xl text-[10px] md:text-xs active:scale-95 transition-all">동기화</button>}</div></div><div className="flex flex-col gap-2"><label className={`pl-1 text-[10px] md:text-[12px] font-black uppercase tracking-wider ${theme.labelText}`}>기술 블로그</label><input type="text" name="blogUrl" value={formData.blogUrl || ""} onChange={handleChange} placeholder="https://velog.io/@your-id" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border outline-none transition-all text-[14px] md:text-base ${theme.innerInputBg}`} /></div></div>
@@ -485,7 +650,7 @@ const ResumeForm = ({
                 <div className="flex flex-col gap-4 md:gap-6">
                   {formData.workExperiences.map((work, index) => (
                     <div key={index} className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border ${theme.cardBg} relative group space-y-4 md:space-y-6 transition-all hover:border-blue-500/30 shadow-sm`}>
-                      <button type="button" onClick={() => removeWork(index)} className="absolute -right-1 -top-1 w-7 h-7 md:w-9 md:h-9 bg-red-500 text-white rounded-lg md:rounded-xl flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all font-bold shadow-xl z-10 text-[10px] md:text-xs">✕</button>
+                      <button type="button" onClick={() => removeWork(index)} className="absolute right-2 top-2 w-7 h-7 md:w-9 md:h-9 bg-red-500 text-white rounded-lg md:rounded-xl flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all font-bold shadow-xl z-50 text-[10px] md:text-xs">✕</button>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-5"><div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>회사명</label><input type="text" name="companyName" value={work.companyName || ""} onChange={(e) => handleWorkChange(index, e)} placeholder="회사명 입력" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} font-black text-[14px] md:text-base`} /></div><div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>직급 / 직위</label><input type="text" name="position" value={work.position || ""} onChange={(e) => handleWorkChange(index, e)} placeholder="예: 과장, 선임, 사원" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} text-[14px] md:text-base`} /></div></div>
                       <div className="flex flex-col gap-1.5 relative">
                         <label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>담당 직무</label>
@@ -522,7 +687,7 @@ const ResumeForm = ({
                 <div className={`p-3 md:p-5 rounded-xl md:rounded-[24px] border ${theme.cardBg} flex items-center justify-between shadow-sm`}><h4 className={`text-[12px] md:text-[14px] font-black ${theme.titleText}`}>자격 / 수상 ({formData.certifications.length})</h4><button type="button" onClick={addCert} className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black active:scale-95 transition-all">+ 추가</button></div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   {formData.certifications.map((cert, index) => (
-                    <div key={index} className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border ${theme.cardBg} relative group space-y-3.5 md:space-y-5 transition-all hover:border-blue-500/30 shadow-sm`}><button type="button" onClick={() => removeCert(index)} className="absolute -right-1 -top-1 w-7 h-7 md:w-9 md:h-9 bg-red-500 text-white rounded-lg md:rounded-xl flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all font-bold shadow-xl z-10 text-[10px] md:text-xs">✕</button>
+                    <div key={index} className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border ${theme.cardBg} relative group space-y-3.5 md:space-y-5 transition-all hover:border-blue-500/30 shadow-sm`}><button type="button" onClick={() => removeCert(index)} className="absolute right-2 top-2 w-7 h-7 md:w-9 md:h-9 bg-red-500 text-white rounded-lg md:rounded-xl flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all font-bold shadow-xl z-50 text-[10px] md:text-xs">✕</button>
                       <div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>명칭</label><input type="text" name="name" value={cert.name || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} text-[14px] font-bold`} /></div>
                       <div className="grid grid-cols-2 gap-3 md:gap-4"><div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>발급기관</label><input type="text" name="issuer" value={cert.issuer || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} text-[14px]`} /></div><div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>점수 / 등급</label><input type="text" name="score" value={cert.score || ""} onChange={(e) => handleCertChange(index, e)} className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} text-[14px]`} /></div></div>
                       <div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>취득일</label><YearMonthPicker value={cert.date || ""} onChange={(val) => handleCertChange(index, { target: { name: 'date', value: val } })} isDarkMode={isDarkMode} /></div>
@@ -540,7 +705,7 @@ const ResumeForm = ({
                   <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-4 md:gap-6">
                     {formData.projects.map((project, index) => (
                       <Draggable key={project.id} draggableId={String(project.id)} index={index}>{(provided, snapshot) => (
-                        <div ref={provided.innerRef} {...provided.draggableProps} style={provided.draggableProps.style} className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border transition-all duration-200 ${snapshot.isDragging ? 'shadow-2xl border-blue-500 bg-white dark:bg-zinc-800 z-[100] scale-[1.02]' : theme.cardBg} relative group shadow-sm`}><button type="button" onClick={() => removeProject(index)} className="absolute -right-1 -top-1 w-7 h-7 md:w-9 md:h-9 bg-red-500 text-white rounded-lg md:rounded-xl flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all font-bold shadow-xl z-50 text-[10px] md:text-xs">✕</button><div {...provided.dragHandleProps} className="absolute left-1/2 -translate-x-1/2 top-2.5 w-10 md:w-12 h-1 md:h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full cursor-grab active:cursor-grabbing" />
+                        <div ref={provided.innerRef} {...provided.draggableProps} style={provided.draggableProps.style} className={`p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-[32px] border transition-all duration-200 ${snapshot.isDragging ? 'shadow-2xl border-blue-500 bg-white dark:bg-zinc-800 z-[100] scale-[1.02]' : theme.cardBg} relative group shadow-sm`}><button type="button" onClick={() => removeProject(index)} className="absolute right-2 top-2 w-7 h-7 md:w-9 md:h-9 bg-red-500 text-white rounded-lg md:rounded-xl flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all font-bold shadow-xl z-50 text-[10px] md:text-xs">✕</button><div {...provided.dragHandleProps} className="absolute left-1/2 -translate-x-1/2 top-2.5 w-10 md:w-12 h-1 md:h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full cursor-grab active:cursor-grabbing" />
                           <div className="space-y-4 md:space-y-6 mt-3 md:mt-4">
                             <div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>프로젝트명</label><input type="text" name="name" value={project.name || ""} onChange={(e) => handleProjectChange(index, e)} className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} font-black text-[15px] md:text-lg`} /></div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-5"><div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>담당 역할</label><input type="text" name="role" value={project.role || ""} onChange={(e) => handleProjectChange(index, e)} autoComplete="off" placeholder="예: 프론트엔드 개발" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} text-[14px] md:text-base`} /></div><div className="flex flex-col gap-1.5"><label className={`text-[10px] md:text-[11px] font-black uppercase ${theme.subText}`}>기술 스택</label><input type="text" name="techStack" value={project.techStack || ""} onChange={(e) => handleProjectChange(index, e)} placeholder="예: React, Node.js" className={`w-full px-3.5 py-2.5 md:px-4 md:py-3 rounded-lg md:rounded-xl border ${theme.innerInputBg} text-[14px] md:text-base`} /></div></div>
@@ -590,7 +755,12 @@ const ResumeForm = ({
                 {renderStepNavigation()}
               </div>
             )}
+            
+            </motion.div>
+            </AnimatePresence>
+            </div>
           </DragDropContext>
+
         </div>
       </div>
 
