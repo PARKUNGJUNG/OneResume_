@@ -226,16 +226,37 @@ function UserResumePage({ subdomain }) {
         {focusedPage && (
           <div className="fixed inset-0 z-[150] pointer-events-none flex flex-col items-center justify-between p-6 animate-fade-in print:hidden">
             <div className="w-full flex justify-end pointer-events-auto">
-              <button onClick={() => setFocusedPage(null)} className="w-12 h-12 bg-black/60 hover:bg-black/80 backdrop-blur-2xl text-white rounded-2xl flex items-center justify-center transition-all shadow-2xl active:scale-90 border border-white/10">
+              <button 
+                onClick={() => setFocusedPage(null)} 
+                className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all shadow-2xl active:scale-90 border ${
+                  isDarkMode 
+                    ? 'bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700' 
+                    : 'bg-black/80 hover:bg-black text-white border-white/20'
+                }`}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             <div className="w-full flex justify-between items-center px-2">
-              <button onClick={handlePrevPage} className="pointer-events-auto w-14 h-14 bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 border border-white/10 group">
+              <button 
+                onClick={handlePrevPage} 
+                className={`pointer-events-auto w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 border ${
+                  isDarkMode 
+                    ? 'bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700' 
+                    : 'bg-black/80 hover:bg-black text-white border-white/20'
+                } group`}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M15 19l-7-7 7-7" /></svg>
               </button>
-              <button onClick={handleNextPage} className="pointer-events-auto w-14 h-14 bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 border border-white/10 group">
+              <button 
+                onClick={handleNextPage} 
+                className={`pointer-events-auto w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 border ${
+                  isDarkMode 
+                    ? 'bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700' 
+                    : 'bg-black/80 hover:bg-black text-white border-white/20'
+                } group`}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
