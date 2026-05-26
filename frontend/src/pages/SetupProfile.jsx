@@ -416,7 +416,7 @@ const SetupProfile = ({ isDarkMode, toggleDarkMode }) => {
         )}
       </AnimatePresence>
 
-      <header className={`h-14 px-4 md:px-6 border-b flex items-center justify-between z-40 relative ${isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
+      <header className={`h-14 px-4 md:px-6 border-b flex items-center justify-between z-40 relative backdrop-blur-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/90 border-zinc-800 shadow-lg shadow-black/20' : 'bg-white/90 border-zinc-200 shadow-sm'}`}>
         <div className="flex items-center gap-2.5">
           <img src={logo} alt="OneResume Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain" />
           <h1 className={`text-[1rem] md:text-[1.2rem] font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume</h1>

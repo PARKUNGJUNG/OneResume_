@@ -79,24 +79,24 @@ function ConnectModal({ isOpen, onClose, isDarkMode, isExtensionInstalled }) {
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-purple-600/10 via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
         
-        <div className="p-10 relative z-10">
-          <div className="flex justify-between items-start mb-10">
-            <div className="flex items-center gap-5">
+        <div className="p-6 md:p-10 relative z-10">
+          <div className="flex justify-between items-start mb-6 md:mb-10">
+            <div className="flex items-center gap-3 md:gap-5">
               <div className="relative group">
                 {/* 외곽 앰비언트 글로우: 우리 브랜드 컬러(Purple/Blue) */}
                 <div className="absolute -inset-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 rounded-[28px] blur-xl opacity-0 group-hover:opacity-100 transition duration-700"></div>
                 
-                <div className={`relative w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-500 shadow-2xl border ${
+                <div className={`relative w-12 h-12 md:w-16 md:h-16 rounded-[18px] md:rounded-[24px] flex items-center justify-center transition-all duration-500 shadow-2xl border ${
                   isDarkMode 
                     ? 'bg-zinc-800/40 border-white/10 backdrop-blur-md' 
                     : 'bg-white/80 border-zinc-200 backdrop-blur-md'
                 }`}>
                   {/* 로고 하단에 아주 살짝 우리 테마의 보랏빛 빛 번짐 추가 */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 rounded-[24px]"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-blue-500/10 rounded-[18px] md:rounded-[24px]"></div>
                   
                   <svg 
                     viewBox="0 0 48 48" 
-                    className="w-11 h-11 relative z-10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
+                    className="w-8 h-8 md:w-11 md:h-11 relative z-10 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <defs>
@@ -123,70 +123,92 @@ function ConnectModal({ isOpen, onClose, isDarkMode, isExtensionInstalled }) {
                 </div>
               </div>
               <div>
-                <h3 className={`text-2xl font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume Connect</h3>
-                <div className="flex items-center gap-2.5 mt-2">
-                  <div className={`w-2 h-2 rounded-full ${isExtensionInstalled ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.6)] animate-pulse' : 'bg-zinc-500'}`} />
-                  <span className={`text-[11px] font-black uppercase tracking-[0.15em] ${isExtensionInstalled ? 'text-emerald-500' : 'text-zinc-400'}`}>
+                <h3 className={`text-lg md:text-2xl font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>OneResume Connect</h3>
+                <div className="flex items-center gap-2 md:gap-2.5 mt-1.5 md:mt-2">
+                  <div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${isExtensionInstalled ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.6)] animate-pulse' : 'bg-zinc-500'}`} />
+                  <span className={`text-[9px] md:text-[11px] font-black uppercase tracking-[0.1em] md:tracking-[0.15em] ${isExtensionInstalled ? 'text-emerald-500' : 'text-zinc-400'}`}>
                     {isExtensionInstalled ? 'Extension Active' : 'Extension Not Detected'}
                   </span>
                 </div>
               </div>
             </div>
-            <button onClick={onClose} className={`w-10 h-10 flex items-center justify-center rounded-2xl hover:bg-zinc-500/10 transition-all active:scale-90 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M6 18L18 6M6 6l12 12" /></svg>
+            <button onClick={onClose} className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl md:rounded-2xl hover:bg-zinc-500/10 transition-all active:scale-90 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
 
-          <div className="space-y-6">
-            <div className={`p-8 rounded-[32px] border-2 border-dashed transition-all ${
-              isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'
-            }`}>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-blue-600/10 text-blue-600 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">1</div>
-                  <p className={`text-sm font-bold leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
-                    채용 사이트에서 <span className="text-blue-600 underline underline-offset-4">원클릭으로 이력서를 입력</span>하려면 확장 프로그램이 필요합니다.
-                  </p>
+          <div className="space-y-4 md:space-y-6">
+            {/* PC 환경 렌더링 (확장 프로그램 연동/동기화) */}
+            <div className="hidden md:block space-y-6">
+              <div className={`p-5 md:p-8 rounded-[24px] md:rounded-[32px] border-2 border-dashed transition-all ${
+                isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'
+              }`}>
+                <div className="space-y-3 md:space-y-4">
+                  <div className="flex items-start gap-2.5 md:gap-3">
+                    <div className="w-5 h-5 md:w-6 md:h-6 bg-blue-600/10 text-blue-600 rounded-full flex items-center justify-center text-[10px] md:text-xs font-black flex-shrink-0 mt-0.5">1</div>
+                    <p className={`text-xs md:text-sm font-bold leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                      채용 사이트에서 <span className="text-blue-600 underline underline-offset-4">원클릭으로 이력서를 입력</span>하려면 확장 프로그램이 필요합니다.
+                    </p>
+                  </div>
+                  {!isExtensionInstalled && (
+                    <button 
+                      onClick={() => window.open('https://chrome.google.com/webstore', '_blank')}
+                      className="w-full py-3 md:py-4 bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 text-white rounded-xl md:rounded-2xl text-[13px] md:text-sm font-black hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-black/10"
+                    >
+                      확장 프로그램 설치하기
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    </button>
+                  )}
                 </div>
-                {!isExtensionInstalled && (
-                  <button 
-                    onClick={() => window.open('https://chrome.google.com/webstore', '_blank')}
-                    className="w-full py-4 bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 text-white rounded-2xl text-sm font-black hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-black/10"
-                  >
-                    확장 프로그램 설치하기
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                  </button>
-                )}
+              </div>
+
+              <div className="flex flex-col gap-3 md:gap-4">
+                <button 
+                  onClick={handleSyncExtension}
+                  disabled={isSyncing}
+                  className={`w-full py-6 md:py-8 rounded-[24px] md:rounded-[32px] transition-all transform hover:-translate-y-1 active:scale-95 group flex flex-col items-center justify-center gap-3 md:gap-4 ${
+                    isDarkMode 
+                      ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-2xl shadow-purple-900/40' 
+                      : 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-2xl shadow-purple-500/30'
+                  }`}
+                >
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-white/10 backdrop-blur-md rounded-[18px] md:rounded-[24px] flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 md:h-8 md:w-8 ${isSyncing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-lg md:text-xl font-black block tracking-tight">원클릭 동기화</span>
+                    <span className="text-[10px] md:text-xs opacity-70 mt-1 font-bold block uppercase tracking-widest">Extension Real-time Sync</span>
+                  </div>
+                </button>
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <button 
-                onClick={handleSyncExtension}
-                disabled={isSyncing}
-                className={`w-full py-8 rounded-[32px] transition-all transform hover:-translate-y-1 active:scale-95 group flex flex-col items-center justify-center gap-4 ${
-                  isDarkMode 
-                    ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-2xl shadow-purple-900/40' 
-                    : 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-2xl shadow-purple-500/30'
-                }`}
-              >
-                <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-[24px] flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-8 w-8 ${isSyncing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            {/* 모바일 환경 렌더링 (예외 안내) */}
+            <div className="md:hidden space-y-4">
+              <div className={`p-6 rounded-[24px] border-2 border-dashed flex flex-col items-center text-center gap-3 transition-all ${
+                isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'
+              }`}>
+                <div className="w-12 h-12 bg-blue-600/10 text-blue-600 rounded-full flex items-center justify-center mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                <div className="text-center">
-                  <span className="text-xl font-black block tracking-tight">원클릭 동기화</span>
-                  <span className="text-xs opacity-70 mt-1 font-bold block uppercase tracking-widest">Extension Real-time Sync</span>
-                </div>
-              </button>
+                <p className={`text-[13px] font-black leading-relaxed ${isDarkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>
+                  크롬 확장 프로그램 연동은<br/><span className="text-blue-600 underline underline-offset-4">PC 데스크톱 환경</span>에서만 지원됩니다.
+                </p>
+                <p className={`text-[11px] font-medium leading-relaxed mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
+                  PC로 접속하여 사람인, 잡코리아 등 채용 플랫폼에<br/>완성된 이력서를 원클릭으로 등록해 보세요!
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col items-center gap-4 text-center">
-            <p className={`text-[11px] font-bold leading-relaxed max-w-[280px] ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>확장 프로그램은 사용자의 데이터를 안전하게 암호화하여 처리합니다.</p>
+          <div className="mt-8 md:mt-10 flex flex-col items-center gap-3 md:gap-4 text-center">
+            <p className={`text-[10px] md:text-[11px] font-bold leading-relaxed max-w-[280px] ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>확장 프로그램은 사용자의 데이터를 안전하게 암호화하여 처리합니다.</p>
             
             <button 
               onClick={handleCopyJson}
-              className={`text-[11px] font-black uppercase tracking-widest transition-colors hover:underline underline-offset-4 ${
+              className={`text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-colors hover:underline underline-offset-4 ${
                 isDarkMode ? 'text-zinc-700 hover:text-zinc-500' : 'text-zinc-300 hover:text-zinc-500'
               }`}
             >

@@ -175,8 +175,8 @@ function UserResumePage({ subdomain }) {
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-500 ${isDarkMode ? 'bg-[#09090b]' : 'bg-[#f4f4f5]'}`}>
-      <header className={`fixed top-0 left-0 right-0 h-14 md:h-16 flex items-center justify-between px-4 md:px-6 z-[200] backdrop-blur-xl border-b print:hidden transition-all duration-300 shadow-sm ${
-        isDarkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-white/80 border-zinc-200'
+      <header className={`fixed top-0 left-0 right-0 h-14 md:h-16 flex items-center justify-between px-4 md:px-6 z-[200] backdrop-blur-md border-b print:hidden transition-all duration-300 ${
+        isDarkMode ? 'bg-zinc-900/90 border-zinc-800 shadow-lg shadow-black/20' : 'bg-white/90 border-zinc-200 shadow-sm'
       }`}>
         <div className="flex items-end gap-2 md:gap-2.5">
           <div 

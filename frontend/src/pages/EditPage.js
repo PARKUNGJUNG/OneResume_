@@ -160,6 +160,42 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const [activeZoom, setActiveZoom] = useState(dynamicFormZoom);
   useEffect(() => { if (!isDragging) setActiveZoom(dynamicFormZoom); }, [dynamicFormZoom, isDragging]);
 
+  const [showBottomBar, setShowBottomBar] = useState(true);
+  const scrollAccumulator = useRef(0);
+  const lastScrollTop = useRef(0);
+
+  // --- 모바일 하단바 스크롤 숨김 로직 ---
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const handleScroll = (e) => {
+      const currentScroll = e.target.scrollTop;
+      const delta = currentScroll - lastScrollTop.current;
+      
+      if (delta > 0) {
+        // 스크롤 내리는 중 (숨기기 - 둔감하게)
+        scrollAccumulator.current += delta;
+        if (scrollAccumulator.current > 250) {
+          setShowBottomBar(false);
+        }
+      } else {
+        // 스크롤 올리는 중 (보여주기 - 즉각적으로)
+        setShowBottomBar(true);
+        scrollAccumulator.current = 0;
+      }
+      
+      lastScrollTop.current = currentScroll;
+    };
+
+    // 편집/미리보기 컨테이너 모두 감시
+    const containers = document.querySelectorAll('.custom-scrollbar');
+    containers.forEach(container => container.addEventListener('scroll', handleScroll));
+    
+    return () => {
+      containers.forEach(container => container.removeEventListener('scroll', handleScroll));
+    };
+  }, [isMobile, activeView]);
+
   if (loading) return <PageLayout isDarkMode={isDarkMode}><div className="h-full flex items-center justify-center animate-pulse text-slate-500 font-bold text-xl">데이터 로딩 중...</div></PageLayout>;
 
   const getScale = () => {
@@ -194,7 +230,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
 
   return (
     <PageLayout isDarkMode={isDarkMode} noPadding={true}>
-      <header className={`h-14 px-3 md:px-6 border-b flex items-center justify-between z-40 print:hidden ${isDarkMode ? 'bg-zinc-950/80 border-zinc-800' : 'bg-white/80 border-zinc-200'}`}>
+      <header className={`sticky top-0 h-14 px-3 md:px-6 border-b flex items-center justify-between z-50 print:hidden backdrop-blur-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/90 border-zinc-800 shadow-lg shadow-black/20' : 'bg-white/90 border-zinc-200 shadow-sm'}`}>
         <div className="flex items-center gap-2 md:gap-4 flex-shrink-0 mr-2">
           <div className="flex items-center gap-1.5 md:gap-2.5 flex-shrink-0">
             <img src={logo} alt="OneResume Logo" onClick={() => window.location.reload()} className="w-6 h-6 md:w-8 md:h-8 object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110 active:scale-95" />
@@ -359,7 +395,18 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         )}
         {( !isMobile || activeView === 'preview') && (
           <>
-            <button onClick={() => setIsLayoutOpen(!isLayoutOpen)} className={`fixed z-[60] w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 active:scale-90 ${isLayoutOpen ? (isDarkMode ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' : 'bg-zinc-900 border-zinc-700 text-white') : (isDarkMode ? 'bg-zinc-800 border-zinc-700 text-blue-400 hover:border-blue-500 hover:text-white' : 'bg-white border-zinc-200 text-blue-600 hover:border-blue-400')} ${isMobile ? 'bottom-20 right-4' : 'bottom-8'}`} style={{ left: isMobile ? 'auto' : `calc(${leftWidth}% - 80px)` }}>{isLayoutOpen ? <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M6 18L18 6M6 6l12 12" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 11a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2zM4 17a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2z" /></svg>}</button>
+            <button onClick={() => setIsLayoutOpen(!isLayoutOpen)} className={`fixed z-[60] w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 active:scale-90 ${isLayoutOpen ? (isDarkMode ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' : 'bg-zinc-900 border-zinc-700 text-white') : (isDarkMode ? 'bg-zinc-800 border-zinc-700 text-blue-400 hover:border-blue-500 hover:text-white' : 'bg-white border-zinc-200 text-blue-600 hover:border-blue-400')} ${isMobile ? 'bottom-20 right-4' : 'bottom-8'}`} style={{ left: isMobile ? 'auto' : `calc(${leftWidth}% - 80px)` }}>
+              {isLayoutOpen ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                  {/* 왼쪽 리스트 라인 */}
+                  <path strokeLinecap="round" d="M4 7h7M4 12h7M4 17h7" />
+                  {/* 오른쪽 위아래 화살표 */}
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 9l3-3 3 3M20 6v12M17 15l3 3 3-3" />
+                </svg>
+              )}
+            </button>
             {isLayoutOpen && (
               <div className={`fixed w-52 sm:w-64 lg:w-72 p-3 sm:p-4 lg:p-4 rounded-[22px] border-2 animate-in slide-in-from-bottom-8 fade-in zoom-in-95 duration-200 z-[9999] origin-top-right ${isDarkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-200'} ${isMobile ? 'bottom-36 right-4' : 'bottom-28'}`} style={{ left: isMobile ? 'auto' : `calc(${leftWidth}% - ${windowSize.width < 1280 ? '290px' : '320px'})` }}><div className="flex items-center gap-2 mb-2.5 lg:mb-3.5"><div className="w-1 h-3 sm:w-1.5 sm:h-4 bg-blue-600 rounded-full shadow-lg" /><h4 className={`font-black text-[10px] sm:text-[11px] lg:text-sm uppercase tracking-wider ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>섹션 순서 배치</h4></div><div className="space-y-1"><div className="pr-0"><ResumeForm formData={formData} handleDragEnd={handleDragEndWithState} onDragStart={handleDragStart} isDarkMode={isDarkMode} onlyLayout={true} /></div></div></div>
             )}
@@ -367,34 +414,44 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         )}
       </main>
       {isMobile && (
-        <div className={`fixed bottom-0 left-0 right-0 h-14 border-t z-[100] flex items-center px-4 gap-2 backdrop-blur-xl ${isDarkMode ? 'bg-zinc-900/90 border-zinc-800' : 'bg-white/90 border-zinc-200 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]'}`}>
+        <div className={`fixed bottom-0 left-0 right-0 h-16 border-t z-[100] flex items-center px-4 gap-2 backdrop-blur-xl transition-all duration-500 ease-in-out ${
+          showBottomBar ? 'translate-y-0' : 'translate-y-full opacity-0'
+        } ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white/50 border-zinc-200 shadow-[0_-4px_30px_rgba(0,0,0,0.08)]'}`}>
           <button
             onClick={() => setActiveView('edit')}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 h-10 rounded-lg transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center gap-1 h-12 rounded-xl transition-all ${
               activeView === 'edit'
                 ? 'text-blue-600 bg-blue-500/5'
                 : 'text-zinc-400 hover:text-zinc-600'
             }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}> 
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}> 
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            <span className="text-[9px] font-black uppercase tracking-tighter">편집하기</span>
+            <span className="text-[10px] font-[900] uppercase tracking-tighter">작성하기</span>
           </button>
-          <div className="w-[1px] h-5 bg-zinc-500/10" />
+
+          <button
+            onClick={handleSubmit}
+            className="flex-1 flex flex-col items-center justify-center gap-1 h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+            <span className="text-[10px] font-[900] uppercase tracking-tighter">이력서 저장</span>
+          </button>
+
           <button
             onClick={() => setActiveView('preview')}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 h-10 rounded-lg transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center gap-1 h-12 rounded-xl transition-all ${
               activeView === 'preview'
                 ? 'text-blue-600 bg-blue-500/5'
                 : 'text-zinc-400 hover:text-zinc-600'
             }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}> 
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}> 
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span className="text-[9px] font-black uppercase tracking-tighter">미리보기</span>
+            <span className="text-[10px] font-[900] uppercase tracking-tighter">미리보기</span>
           </button>
         </div>
       )}
