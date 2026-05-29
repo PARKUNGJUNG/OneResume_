@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "OneResume Connect",
-  "version": "1.1.7",
-  "description": "OneResume 마스터 이력서를 채용 사이트에 자동으로 동기화합니다.",
+  "version": "1.1.8",
+  "description": "OneResume 이력서로 사람인, 잡코리아 1초 자동 입력! AI 채용공고 분석과 맞춤형 자소서 생성까지 한 번에 해결하세요.",
   "permissions": ["storage", "activeTab", "webNavigation"],
   "background": {
     "service_worker": "background.js"
@@ -19,17 +19,17 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/logo.png",
-      "32": "icons/logo.png",
-      "48": "icons/logo.png",
-      "128": "icons/logo.png"
+      "16": "icons/logo16.png",
+      "32": "icons/logo32.png",
+      "48": "icons/logo48.png",
+      "128": "icons/logo128.png"
     }
   },
   "icons": {
-    "16": "icons/logo.png",
-    "32": "icons/logo.png",
-    "48": "icons/logo.png",
-    "128": "icons/logo.png"
+    "16": "icons/logo16.png",
+    "32": "icons/logo32.png",
+    "48": "icons/logo48.png",
+    "128": "icons/logo128.png"
   },
   "content_scripts": [
     {
@@ -47,7 +47,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icons/logo.png", "icons/saramin.webp"],
+      "resources": ["icons/logo.png", "icons/logo16.png", "icons/logo32.png", "icons/logo48.png", "icons/logo128.png", "icons/saramin.webp"],
       "matches": ["*://*.saramin.co.kr/*", "*://*.jobkorea.co.kr/*", "*://*.wanted.co.kr/*"]
     }
   ]

@@ -4,7 +4,7 @@
  * ---------------------------------------------------------
  */
 
-console.log("🚀 OneResume Connect: Engine v1.5.0 Loaded");
+console.log("OneResume Connect: Engine v1.5.0 Loaded");
 
 let cachedResumeData = null;
 let isExtensionActive = true;
@@ -334,7 +334,7 @@ const createOverlay = (siteName, themeColor, mode = 'ready') => {
       <div class="or-box" style="${boxStyle}">
         <div class="or-inner-content">
           <div class="or-logo or-brand">
-            <img src="${chrome.runtime.getURL('icons/logo.png')}" alt="OR" style="width: 100%; height: 100%; object-fit: cover;">
+            <img src="${chrome.runtime.getURL('icons/logo128.png')}" alt="OR" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="or-reveal-group">
             <div class="or-arrow ${arrowClass}">
@@ -698,7 +698,7 @@ const createAIWidget = () => {
         copyBtn.addEventListener('click', (e) => {
           const textToCopy = `[지원동기]\n${data.motivation}\n\n[직무 역량]\n${data.competency}\n\n[성장과정/성격]\n${data.character}`;
           navigator.clipboard.writeText(textToCopy).then(() => {
-            copyBtn.innerText = "✨ 복사 완료!";
+            copyBtn.innerText = "복사 완료!";
             copyBtn.style.background = "#10b981";
             setTimeout(() => {
               copyBtn.innerText = "본문 전체 복사하기";
