@@ -493,12 +493,30 @@ const initSmartEngine = () => {
   if (!isExtensionActive) return;
   try {
     const host = window.location.hostname;
+    const path = window.location.pathname;
     let siteName = null;
     let themeColor = null;
-    if (host.includes('saramin.co.kr')) { siteName = '사람인'; themeColor = '#4876ef'; }
-    else if (host.includes('jobkorea.co.kr')) { siteName = '잡코리아'; themeColor = '#ff4b13'; }
+    let isResumePage = false;
+
+    if (host.includes('saramin.co.kr')) { 
+      siteName = '사람인'; 
+      themeColor = '#4876ef';
+      // 사람인 이력서 작성/수정 페이지 경로 체크
+      if (path.includes('/zf_user/resume/resume-edit') || path.includes('/zf_user/resume/resume-manage')) {
+        isResumePage = true;
+      }
+    }
+    else if (host.includes('jobkorea.co.kr')) { 
+      siteName = '잡코리아'; 
+      themeColor = '#ff4b13';
+      // 잡코리아 이력서 작성/수정 페이지 경로 체크
+      if (path.includes('/User/Resume/Write') || path.includes('/User/Resume/Modify') || path.includes('/User/Resume/ResumeManage')) {
+        isResumePage = true;
+      }
+    }
     
-    if (siteName && window.self === window.top) {
+    // 이력서 페이지인 경우에만 알림 및 FAB(엔진) 초기화
+    if (siteName && isResumePage && window.self === window.top) {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => { 
           createOverlay(siteName, themeColor); 

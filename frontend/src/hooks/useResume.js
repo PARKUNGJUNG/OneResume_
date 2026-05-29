@@ -293,7 +293,7 @@ const useResume = () => {
     const token = localStorage.getItem("oneresume-token") || sessionStorage.getItem("oneresume-token");
     
     if (!token) {
-      toast.error("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+      toast.error("로그인 세션이 만료되었습니다.\n다시 로그인해주세요.");
       navigate("/");
       return;
     }

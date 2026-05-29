@@ -29,7 +29,7 @@ function ConnectModal({ isOpen, onClose, isDarkMode, isExtensionInstalled }) {
     const syncTimeout = setTimeout(() => {
       if (isSyncing) {
         setIsSyncing(false);
-        toast.error("연동 응답 시간이 초과되었습니다. 페이지 새로고침 후 다시 시도해 주세요.", { id: loadingToast });
+        toast.error("연동 응답 시간이 초과되었습니다.\n페이지 새로고침 후 다시 시도해 주세요.", { id: loadingToast });
       }
     }, 5000);
 

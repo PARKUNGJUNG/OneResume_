@@ -75,7 +75,7 @@ const Signup = ({ onSuccess, onSwitch, isDarkMode }) => {
   const handleFinalSignup = async () => {
     const subError = getSubdomainError(subdomain);
     if (subError) { toast.error(subError); return; }
-    if (!PWD_REGEX.test(password)) { toast.error("비밀번호 보안 정책을 확인해주세요."); return; }
+    if (!PWD_REGEX.test(password)) { toast.error("비밀번호 보안 정책을 확인해주세요.\n(영문, 숫자, 특수문자 조합 8자 이상)"); return; }
     if (password !== confirmPassword) { toast.error("비밀번호가 일치하지 않습니다."); return; }
 
     const loading = toast.loading("회원가입 처리 중...");

@@ -31,7 +31,7 @@ function App() {
       (error) => {
         // 에러가 났는데 그게 429 요청 초과 라면?
         if (error.response && error.response.status === 429) {
-          toast.error(error.response.data.message || "요청이 너무 많습니다. 1분 후 다시 시도해주세요.", {
+          toast.error(error.response.data.message || "요청이 너무 많습니다.\n1분 후 다시 시도해주세요.", {
             id: 'rate-limit-error', // 중복 토스트 방지용 ID
           });
         }

@@ -190,7 +190,7 @@ const ResumeForm = ({
   const handleAiAudit = async (fieldName, content, context) => {
     if (isAuditing) return;
     if (!content || content.trim().length < 5) {
-      toast.error("분석할 내용이 너무 짧습니다. (최소 5자 이상)");
+      toast.error("분석할 내용이 너무 짧습니다.\n최소 5자 이상 입력해 주세요.");
       return;
     }
     setIsAuditing(true);
