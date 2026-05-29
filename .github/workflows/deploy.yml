@@ -22,8 +22,9 @@ jobs:
             # 1. 프로젝트 폴더로 이동
             cd ~/OneResume 
             
-            # 2. 최신 코드 가져오기
-            git pull origin main
+            # 2. 최신 코드 강제 동기화 (충돌 방지)
+            git fetch origin main
+            git reset --hard origin/main
             
             # 3. 백엔드 설정 및 실행
             cd backend
