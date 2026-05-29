@@ -522,21 +522,49 @@ const extractJDText = () => {
   try {
     let extracted = "";
     if (host.includes('saramin.co.kr')) {
-      const container = document.querySelector('.wrap_jv_cont, .cont_info, .jv_summary, .wrap_jview');
-      if (container) extracted = container.innerText;
+      // 사람인 최신 공고 뷰 및 구형 뷰 통합 대응
+      const selectors = [
+        '.wrap_jv_cont', '.cont_info', '.jv_summary', '.wrap_jview', 
+        '.recruit_content', '#v_main_cnt', '.view_con', '.user_content'
+      ];
+      for (const s of selectors) {
+        const el = document.querySelector(s);
+        if (el && el.innerText.trim().length > 100) {
+          extracted = el.innerText;
+          break;
+        }
+      }
     } else if (host.includes('jobkorea.co.kr')) {
-      const container = document.querySelector('.artReadJobSum, .stContainer, .artReadTxt, .tbRow');
-      if (container) extracted = container.innerText;
+      // 잡코리아 상세 공고 영역 대응
+      const selectors = [
+        '.artReadJobSum', '.stContainer', '.artReadTxt', '.tbRow', 
+        '.recruit-content', '.devRecruitDetail', '#gib_contents'
+      ];
+      for (const s of selectors) {
+        const el = document.querySelector(s);
+        if (el && el.innerText.trim().length > 100) {
+          extracted = el.innerText;
+          break;
+        }
+      }
     }
     
-    if (!extracted || extracted.trim().length < 50) {
-      extracted = document.body.innerText;
+    // 특정 영역 추출 실패 시, 불필요한 태그를 제외한 본문 전체 스캔
+    if (!extracted || extracted.trim().length < 200) {
+      const clone = document.body.cloneNode(true);
+      // 스크립트, 스타일, 내비게이션, 푸터 등 노이즈 제거
+      const junk = clone.querySelectorAll('script, style, nav, footer, header, .header, .footer, #header, #footer');
+      junk.forEach(j => j.remove());
+      extracted = clone.innerText;
     }
+    
     text += extracted;
   } catch (e) {
     text += document.body.innerText;
   }
-  return text.substring(0, 8000);
+  
+  // AI가 읽기 너무 긴 경우를 위해 핵심부 10,000자 제한 (기존 8,000에서 상향)
+  return text.substring(0, 10000).replace(/\s\s+/g, ' ');
 };
 
 const createAIWidget = () => {
