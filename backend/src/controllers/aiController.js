@@ -47,6 +47,8 @@ exports.auditResumeContent = async (req, res) => {
       contents: [{
         parts: [{ text: prompt }]
       }]
+    }, {
+      timeout: 30000 // 30초 타임아웃 설정
     });
 
     // 응답 데이터에서 텍스트 추출
@@ -154,6 +156,8 @@ exports.matchJD = async (req, res) => {
       contents: [{
         parts: [{ text: prompt }]
       }]
+    }, {
+      timeout: 30000 // 30초 타임아웃 설정
     });
 
     const responseText = response.data.candidates[0].content.parts[0].text;
@@ -250,6 +254,8 @@ exports.generateCoverLetter = async (req, res) => {
       contents: [{
         parts: [{ text: prompt }]
       }]
+    }, {
+      timeout: 30000 // 30초 타임아웃 설정
     });
 
     const responseText = response.data.candidates[0].content.parts[0].text;
