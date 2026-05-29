@@ -1,6 +1,25 @@
 const axios = require("axios");
 const prisma = require("../config/prisma");
 
+// [보안] 클라이언트용 안전한 에러 메시지 반환 함수
+const handleAiError = (error, res, customMessage = "AI 분석 서버에 일시적인 문제가 발생했습니다.") => {
+  console.error("Gemini API Error Details:", error.response?.data || error.message);
+  
+  // 429 Quota Exceeded 대응
+  if (error.response?.status === 429 || error.message.includes("429")) {
+    return res.status(429).json({
+      message: "현재 AI 사용량이 많아 잠시 휴식이 필요합니다. 약 1분 후 다시 시도해 주세요.",
+      error: "Quota Exceeded"
+    });
+  }
+
+  // 그 외 일반적인 에러 (500)
+  res.status(500).json({ 
+    message: customMessage + " 잠시 후 다시 시도해 주세요.",
+    error: "Internal Server Error"
+  });
+};
+
 exports.auditResumeContent = async (req, res) => {
   try {
     const { fieldName, content, context } = req.body;
@@ -16,15 +35,19 @@ exports.auditResumeContent = async (req, res) => {
       });
     }
 
-    // [최종 해결] 2.0/2.5는 아직 쿼터가 0일 수 있으므로, 리스트에 있는 안정적인 별칭(Alias) 사용
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+    // [서버 부하 우회] latest 별칭 대신 가장 안정적인 명시적 버전 사용
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const prompt = `
       당신은 세계 최고의 커리어 코치이자 이력서 첨삭 전문가입니다. 
       사용자가 작성한 이력서의 특정 항목을 분석하여 실시간으로 피드백을 주세요.
 
       [분석 대상 항목]: ${fieldName}
-      [현재 작성된 내용]: "${content}"
+      [현재 작성된 내용]: 
+      <<< USER_INPUT_START >>>
+      "${content}"
+      <<< USER_INPUT_END >>>
+
       [추가 컨텍스트]: ${context || "없음"}
 
       [첨삭 가이드라인]:
@@ -48,7 +71,7 @@ exports.auditResumeContent = async (req, res) => {
         parts: [{ text: prompt }]
       }]
     }, {
-      timeout: 30000 // 30초 타임아웃 설정
+      timeout: 20000 // 20초 타임아웃으로 조정
     });
 
     // 응답 데이터에서 텍스트 추출
@@ -64,11 +87,7 @@ exports.auditResumeContent = async (req, res) => {
     res.json(auditResult);
 
   } catch (error) {
-    console.error("Gemini API Direct Error:", error.response?.data || error.message);
-    res.status(500).json({ 
-      message: "AI 분석 중 오류가 발생했습니다.",
-      error: error.response?.data?.error?.message || error.message 
-    });
+    handleAiError(error, res);
   }
 };
 
@@ -229,7 +248,9 @@ exports.generateCoverLetter = async (req, res) => {
       사용자의 [기존 이력서 정보]와 제공된 [채용 공고(JD)]를 분석하여, 이 공고에 완벽하게 맞춤화된 자기소개서 초안을 작성해주세요.
 
       [채용 공고]:
+      <<< USER_INPUT_START >>>
       "${jdText}"
+      <<< USER_INPUT_END >>>
 
       [사용자 이력서 정보]:
       "${resumeText}"
@@ -255,7 +276,7 @@ exports.generateCoverLetter = async (req, res) => {
         parts: [{ text: prompt }]
       }]
     }, {
-      timeout: 30000 // 30초 타임아웃 설정
+      timeout: 20000 // 20초 타임아웃으로 조정
     });
 
     const responseText = response.data.candidates[0].content.parts[0].text;
@@ -269,11 +290,7 @@ exports.generateCoverLetter = async (req, res) => {
     res.json(result);
 
   } catch (error) {
-    console.error("Generate Cover Letter Error:", error.message);
-    res.status(500).json({ 
-      message: "맞춤형 자소서 생성 중 오류가 발생했습니다.",
-      error: error.message 
-    });
+    handleAiError(error, res, "맞춤형 자소서 생성 중 오류가 발생했습니다.");
   }
 };
 

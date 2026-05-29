@@ -658,21 +658,63 @@ const createAIWidget = () => {
       titleBox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 공고 적합도 매칭`;
       const jdText = extractJDText();
       callAI('/api/ai/match-jd', { jdText }, (data) => {
-        let html = `
-          <div style="text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 14px;">
-            <div style="font-size:12px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Match Score</div>
-            <div class="or-ai-score">${data.score}점</div>
-          </div>
-          <div class="or-ai-section-title">일치하는 역량</div>
-          <div style="margin-bottom:10px;">${data.matchedKeywords?.map(k => `<span class="or-ai-tag matched">${k}</span>`).join('') || '-'}</div>
-          <div class="or-ai-section-title">부족한 역량</div>
-          <div style="margin-bottom:10px;">${data.missingKeywords?.map(k => `<span class="or-ai-tag missing">${k}</span>`).join('') || '-'}</div>
-          <div class="or-ai-section-title">AI 개선 팁</div>
-          <ul style="padding-left: 18px; margin-top: 8px;">
-            ${data.improvementTips?.map(t => `<li style="margin-bottom:8px; color:#cbd5e1;">${t}</li>`).join('') || ''}
-          </ul>
-        `;
-        contentBox.innerHTML = html;
+        // [Security] innerHTML 대신 fragment와 textContent를 사용하여 XSS 방어
+        contentBox.innerHTML = ''; // 초기화
+        
+        const scoreBox = document.createElement('div');
+        scoreBox.style.cssText = "text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 14px;";
+        
+        const scoreLabel = document.createElement('div');
+        scoreLabel.style.cssText = "font-size:12px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:1px;";
+        scoreLabel.textContent = "Match Score";
+        
+        const scoreVal = document.createElement('div');
+        scoreVal.className = "or-ai-score";
+        scoreVal.textContent = `${data.score}점`;
+        
+        scoreBox.appendChild(scoreLabel);
+        scoreBox.appendChild(scoreVal);
+        contentBox.appendChild(scoreBox);
+
+        const renderTags = (title, keywords, className) => {
+          const titleDiv = document.createElement('div');
+          titleDiv.className = "or-ai-section-title";
+          titleDiv.textContent = title;
+          contentBox.appendChild(titleDiv);
+          
+          const tagContainer = document.createElement('div');
+          tagContainer.style.marginBottom = "10px";
+          
+          if (keywords && keywords.length > 0) {
+            keywords.forEach(k => {
+              const span = document.createElement('span');
+              span.className = `or-ai-tag ${className}`;
+              span.textContent = k;
+              tagContainer.appendChild(span);
+            });
+          } else {
+            tagContainer.textContent = "-";
+          }
+          contentBox.appendChild(tagContainer);
+        };
+
+        renderTags("일치하는 역량", data.matchedKeywords, "matched");
+        renderTags("부족한 역량", data.missingKeywords, "missing");
+
+        const tipTitle = document.createElement('div');
+        tipTitle.className = "or-ai-section-title";
+        tipTitle.textContent = "AI 개선 팁";
+        contentBox.appendChild(tipTitle);
+
+        const tipList = document.createElement('ul');
+        tipList.style.cssText = "padding-left: 18px; margin-top: 8px;";
+        data.improvementTips?.forEach(t => {
+          const li = document.createElement('li');
+          li.style.cssText = "margin-bottom:8px; color:#cbd5e1;";
+          li.textContent = t;
+          tipList.appendChild(li);
+        });
+        contentBox.appendChild(tipList);
       });
     });
 
@@ -680,30 +722,54 @@ const createAIWidget = () => {
       titleBox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> 맞춤형 자소서 생성`;
       const jdText = extractJDText();
       callAI('/api/ai/generate-cover-letter', { jdText }, (data) => {
-        let html = `
-          <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15)); border: 1px solid rgba(99, 102, 241, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 13px;">
-            <strong style="color:#a5b4fc; display:block; margin-bottom:4px;">💡 AI 작성 전략:</strong> ${data.summary}
-          </div>
-          <div class="or-ai-section-title">1. 지원동기</div>
-          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 12px; white-space: pre-wrap; font-size:13px;">${data.motivation}</div>
-          <div class="or-ai-section-title">2. 직무 역량</div>
-          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 12px; white-space: pre-wrap; font-size:13px;">${data.competency}</div>
-          <div class="or-ai-section-title">3. 성장과정/성격</div>
-          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 12px; white-space: pre-wrap; font-size:13px;">${data.character}</div>
-          <button id="or-copy-cover" style="width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: all 0.2s;">본문 전체 복사하기</button>
-        `;
-        contentBox.innerHTML = html;
+        // [Security] innerHTML 대신 textContent 사용하여 XSS 방어
+        contentBox.innerHTML = ''; // 초기화
+
+        const strategyBox = document.createElement('div');
+        strategyBox.style.cssText = "background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15)); border: 1px solid rgba(99, 102, 241, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 13px;";
         
-        const copyBtn = document.getElementById('or-copy-cover');
+        const strategyTitle = document.createElement('strong');
+        strategyTitle.style.cssText = "color:#a5b4fc; display:block; margin-bottom:4px;";
+        strategyTitle.textContent = "💡 AI 작성 전략:";
+        
+        const strategyText = document.createTextNode(data.summary);
+        strategyBox.appendChild(strategyTitle);
+        strategyBox.appendChild(strategyText);
+        contentBox.appendChild(strategyBox);
+
+        const renderSection = (title, text) => {
+          const titleDiv = document.createElement('div');
+          titleDiv.className = "or-ai-section-title";
+          titleDiv.textContent = title;
+          contentBox.appendChild(titleDiv);
+          
+          const contentDiv = document.createElement('div');
+          contentDiv.style.cssText = "background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 12px; white-space: pre-wrap; font-size:13px;";
+          contentDiv.textContent = text;
+          contentBox.appendChild(contentDiv);
+        };
+
+        renderSection("1. 지원동기", data.motivation);
+        renderSection("2. 직무 역량", data.competency);
+        renderSection("3. 성장과정/성격", data.character);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.id = "or-copy-cover";
+        copyBtn.style.cssText = "width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: all 0.2s;";
+        copyBtn.textContent = "본문 전체 복사하기";
+        
+        contentBox.appendChild(copyBtn);
+        
         copyBtn.addEventListener('click', (e) => {
           const textToCopy = `[지원동기]\n${data.motivation}\n\n[직무 역량]\n${data.competency}\n\n[성장과정/성격]\n${data.character}`;
           navigator.clipboard.writeText(textToCopy).then(() => {
-            copyBtn.innerText = "복사 완료!";
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = "✅ 복사 완료!";
             copyBtn.style.background = "#10b981";
             setTimeout(() => {
-              copyBtn.innerText = "본문 전체 복사하기";
+              copyBtn.textContent = originalText;
               copyBtn.style.background = "#4f46e5";
-            }, 2500);
+            }, 2000);
           });
         });
       });

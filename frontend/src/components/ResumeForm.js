@@ -185,11 +185,15 @@ const ResumeForm = ({
     }
   };
 
+  const [isAuditing, setIsAuditing] = useState(false);
+
   const handleAiAudit = async (fieldName, content, context) => {
+    if (isAuditing) return;
     if (!content || content.trim().length < 5) {
       toast.error("분석할 내용이 너무 짧습니다. (최소 5자 이상)");
       return;
     }
+    setIsAuditing(true);
     const loadingToast = toast.loading("AI가 내용을 분석하고 있습니다...");
     try {
       const result = await auditContent(fieldName, content, context);
@@ -197,11 +201,16 @@ const ResumeForm = ({
         setAiFeedback({ ...result, targetField: fieldName });
         setIsAiModalOpen(true);
         toast.success("분석이 완료되었습니다!", { id: loadingToast });
-      } else {
-        toast.error("AI 분석 중 오류가 발생했습니다.", { id: loadingToast });
       }
     } catch (e) {
-      toast.error("네트워크 오류가 발생했습니다.", { id: loadingToast });
+      if (e.response?.status === 429) {
+        toast.dismiss(loadingToast);
+        return;
+      }
+      const errorMsg = e.response?.data?.message || "서버와 통신할 수 없습니다. 네트워크 상태를 확인해 주세요.";
+      toast.error(errorMsg, { id: loadingToast });
+    } finally {
+      setIsAuditing(false);
     }
   };
 

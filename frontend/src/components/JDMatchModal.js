@@ -38,8 +38,11 @@ function JDMatchModal({ isOpen, onClose, isDarkMode }) {
       toast.success("AI 분석이 완료되었습니다!");
     } catch (error) {
       console.error("Match Error:", error);
-      toast.error(error.response?.data?.message || "분석 중 오류가 발생했습니다.");
-    } finally {
+      if (error.response?.status === 429) return;
+      const errorMsg = error.response?.data?.message || "서버와 통신할 수 없습니다. 잠시 후 다시 시도해 주세요.";
+      toast.error(errorMsg);
+    }
+ finally {
       setLoading(false);
     }
   };

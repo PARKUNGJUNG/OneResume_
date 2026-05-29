@@ -378,6 +378,10 @@ const SetupProfile = ({ isDarkMode, toggleDarkMode }) => {
       toast.success("프로필 작성이 완료되었습니다!", { id: loading });
       navigate('/edit'); 
     } catch (err) {
+      if (err.response?.status === 429) {
+        toast.dismiss(loading);
+        return;
+      }
       toast.error(err.response?.data?.message || "프로필 저장 실패", { id: loading });
     }
   };

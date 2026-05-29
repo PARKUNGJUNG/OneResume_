@@ -55,6 +55,10 @@ const Signup = ({ onSuccess, onSwitch, isDarkMode }) => {
       toast.success("이메일 인증 성공!", { id: loading });
       setIsVerified(true);
     } catch (err) {
+      if (err.response?.status === 429) {
+        toast.dismiss(loading);
+        return;
+      }
       toast.error("인증번호가 틀렸습니다.", { id: loading });
     }
   };

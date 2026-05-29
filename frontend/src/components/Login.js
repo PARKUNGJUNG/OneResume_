@@ -25,6 +25,10 @@ const Login = ({ onSuccess, onSwitchSignup, onSwitchForgot, isDarkMode, remember
       if (onSuccess) onSuccess(response.data);
       
     } catch (err) {
+      if (err.response?.status === 429) {
+        toast.dismiss(loading);
+        return;
+      }
       toast.error(err.response?.data?.message || "로그인 실패", { id: loading });
     }
   };
