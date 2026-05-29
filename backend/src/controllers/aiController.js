@@ -3,13 +3,21 @@ const prisma = require("../config/prisma");
 
 // [보안] 클라이언트용 안전한 에러 메시지 반환 함수
 const handleAiError = (error, res, customMessage = "AI 분석 서버에 일시적인 문제가 발생했습니다.") => {
-  console.error("Gemini API Error Details:", error.response?.data || error.message);
+  const errorDetail = error.response?.data?.error?.message || error.message;
+  const statusCode = error.response?.status;
+
+  // 서버 콘솔에는 상세 로그 출력
+  console.log("-----------------------------------------------");
+  console.error(`🚨 AI Error Trace [${new Date().toLocaleString()}]`);
+  console.error(`- Status Code: ${statusCode}`);
+  console.error(`- Error Message: ${errorDetail}`);
+  console.log("-----------------------------------------------");
   
-  // 429 Quota Exceeded 대응
-  if (error.response?.status === 429 || error.message.includes("429")) {
+  // 429 Quota Exceeded 대응 (Google API 자체 제한)
+  if (statusCode === 429 || error.message.includes("429")) {
     return res.status(429).json({
-      message: "현재 AI 사용량이 많아 잠시 휴식이 필요합니다. 약 1분 후 다시 시도해 주세요.",
-      error: "Quota Exceeded"
+      message: "[Google API 제한] 현재 AI 사용량이 많아 잠시 휴식이 필요합니다.\n약 1분 후 다시 시도해 주세요.",
+      error: "Google Quota Exceeded"
     });
   }
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OneResume Connect",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "OneResume 이력서로 사람인, 잡코리아 1초 자동 입력! AI 채용공고 분석과 맞춤형 자소서 생성까지 한 번에 해결하세요.",
   "permissions": ["storage", "activeTab", "webNavigation"],
   "background": {

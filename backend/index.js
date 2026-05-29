@@ -34,9 +34,9 @@ app.use(express.json());
 // 2. [Security] Rate Limiting 설정
 const generalLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 15,
+  max: 15, // 사용자의 요청에 따라 강력한 보안(분당 15회) 적용
   handler: (req, res) => {
-    res.status(429).json({ message: "요청이 너무 많습니다. 1분 후 다시 시도해주세요." });
+    res.status(429).json({ message: "[서버 제한] 요청이 너무 많습니다.\n1분 후 다시 시도해주세요." });
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -46,7 +46,7 @@ const aiLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 5, // AI 분석은 쿼터 보호를 위해 분당 5회 유지
   handler: (req, res) => {
-    res.status(429).json({ message: "AI 분석 요청이 너무 많습니다. 1분만 휴식 후 다시 시도해주세요." });
+    res.status(429).json({ message: "[서버 제한] AI 분석 요청이 너무 많습니다.\n1분만 휴식 후 다시 시도해주세요." });
   },
   standardHeaders: true,
   legacyHeaders: false,
