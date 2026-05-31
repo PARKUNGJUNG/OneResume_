@@ -85,35 +85,61 @@ exports.searchWorknet = async (req, res) => {
     }
 };
 
-// [0-2] 워크넷 학과 정보 검색 프록시 API
+// [0-2] 워크넷 학과 정보 검색 프록시 API (커리어넷 폴백 포함)
 exports.searchWorknetDept = async (req, res) => {
+    const { keyword } = req.query;
+    console.log(`🔍 [Major Search] Keyword: ${keyword}`);
+
+    if (!keyword || keyword.length < 2) {
+        return res.status(400).json({ message: "검색어는 2자 이상 입력해주세요." });
+    }
+
     try {
-        const { keyword } = req.query;
-        console.log(`🔍 [Worknet Dept Search] Keyword: ${keyword}`);
+        // 1. 고용24 시도
+        if (WORKNET_DEPT_KEY) {
+            const url = `https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo213L01.do?authKey=${WORKNET_DEPT_KEY}&returnType=XML&target=MAJORCD&srchType=K&keyword=${encodeURIComponent(keyword)}`;
+            const response = await axios.get(url);
+            const jsonObj = parser.parse(response.data);
 
-        if (!keyword || keyword.length < 2) {
-            return res.status(400).json({ message: "검색어는 2자 이상 입력해주세요." });
+            if (!jsonObj.GO24?.error && jsonObj.majorsList?.majorList) {
+                console.log("✅ Using Goyong24 Data (213L01)");
+                const items = Array.isArray(jsonObj.majorsList.majorList) ? jsonObj.majorsList.majorList : [jsonObj.majorsList.majorList];
+                
+                // 상세 로깅 (첫 번째 데이터 구조 확인)
+                if (items.length > 0) {
+                    console.log("📦 Sample Goyong24 Item:", JSON.stringify(items[0]));
+                }
+
+                const normalized = items.map(item => {
+                    // XML 파서에 따라 필드가 객체 { "": "값" } 등으로 올 수 있어 방어 로직 추가
+                    const getName = (val) => typeof val === 'object' ? (val['#text'] || val[''] || JSON.stringify(val)) : val;
+                    return {
+                        majorName: getName(item.knowSchDptNm || item.majorNm || ""),
+                        detailName: getName(item.knowDtlSchDptNm || item.univNm || "")
+                    };
+                });
+                console.log(`✅ Sending ${normalized.length} normalized Goyong24 items to frontend`);
+                return res.status(200).json({ univSrch: normalized });
+            }
         }
 
-        if (!WORKNET_DEPT_KEY) {
-            return res.status(500).json({ message: "워크넷 학과 API 키가 설정되지 않았습니다." });
-        }
-
-        // 워크넷 API 명세: 학과 정보 검색 (univSrch)
-        // target=UNIV_DEPT_LIST (학과 리스트 조회) 필수
-        const url = `http://openapi.work.go.kr/opi/opi/opia/univSrch.do?authKey=${WORKNET_DEPT_KEY}&returnType=XML&target=UNIV_DEPT_LIST&srchType=univNm&keyword=${encodeURIComponent(keyword)}&display=20`;
+        // 2. 고용24 실패 시 커리어넷 폴백
+        console.log("🔄 Goyong24 failed or not configured, falling back to CareerNet...");
+        const fallbackUrl = `https://www.career.go.kr/cnet/openapi/getOpenApi?apiKey=${CAREERNET_API_KEY}&svcType=api&svcCode=MAJOR&contentType=json&gubun=univ_list&searchTitle=${encodeURIComponent(keyword)}`;
+        const fallbackRes = await axios.get(fallbackUrl);
+        const careerData = fallbackRes.data?.dataSearch?.content || [];
         
-        console.log(`🔗 Request URL: ${url}`);
-        const response = await axios.get(url);
-        
-        // XML -> JSON 변환
-        const jsonObj = parser.parse(response.data);
-        const items = jsonObj.univDeptList?.item || [];
+        const normalized = careerData.map(item => ({
+            majorName: item.majorName || "",
+            detailName: item.facilName || ""
+        }));
 
-        res.status(200).json({ univSrch: items });
+        console.log(`✅ Sending ${normalized.length} normalized CareerNet items to frontend`);
+        res.status(200).json({ univSrch: normalized });
+
     } catch (error) {
-        console.error("❌ 워크넷 학과 API 에러:", error.response?.data || error.message);
-        res.status(500).json({ message: "워크넷 학과 서버와 통신 중 오류가 발생했습니다." });
+        console.error("❌ 학과 검색 최종 에러:", error.message);
+        res.status(500).json({ message: "학과 검색 중 오류가 발생했습니다." });
     }
 };
 

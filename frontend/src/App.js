@@ -94,6 +94,11 @@ function App() {
       <Toaster
         position="top-center"
         reverseOrder={false}
+        containerStyle={{
+          // 아이폰 노치(Safe Area) 대응: 홈 화면 추가(PWA) 시 상단 가림 방지
+          top: 'env(safe-area-inset-top, 20px)',
+          marginTop: '8px'
+        }}
         toastOptions={{
           className: 'oneresume-toast',
           style: {

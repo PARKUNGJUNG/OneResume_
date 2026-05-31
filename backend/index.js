@@ -32,11 +32,21 @@ app.set('trust proxy', 2);
 app.use(express.json());
 
 // 2. [Security] Rate Limiting 설정
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 15, // 로그인/회원가입은 강력한 보안 유지 (분당 15회)
+  handler: (req, res) => {
+    res.status(429).json({ message: "인증 요청이 너무 많습니다.\n1분 후 다시 시도해주세요." });
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const generalLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 15, // 사용자의 요청에 따라 강력한 보안(분당 15회) 적용
+  max: 100, // 검색, 데이터 조회 등 일반 기능은 넉넉하게 허용 (분당 100회)
   handler: (req, res) => {
-    res.status(429).json({ message: "요청이 너무 많습니다.\n1분 후 다시 시도해주세요." });
+    res.status(429).json({ message: "요청이 너무 많습니다.\n잠시 후 다시 시도해주세요." });
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -82,7 +92,7 @@ app.use(helmet({
 
 // [v1.7.5] 라우터별 리미터 할당 (중첩 방지 및 확실한 적용)
 app.use('/api/ai', aiLimiter, aiRoutes);
-app.use('/api/auth', generalLimiter, authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/resume', generalLimiter, resumeRoutes);
 app.use('/api/external', generalLimiter, externalRoutes);
 

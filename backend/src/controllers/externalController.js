@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { XMLParser } = require('fast-xml-parser');
 
 /**
  * 워크넷(고용24) API 연동 컨트롤러
@@ -17,20 +18,14 @@ const searchJobs = async (req, res) => {
       return res.status(500).json({ error: 'API 인증키가 설정되지 않았습니다.' });
     }
 
-    // 워크넷 직업정보 API 호출
-    const response = await axios.get('http://openapi.work.go.kr/opi/opi/opia/jobSrch.do', {
-      params: {
-        authKey: authKey,
-        returnType: 'json',
-        srchType: 'keyword',
-        keyword: keyword,
-        display: 10
-      }
-    });
+    // [고용24 최신 통합 API 엔드포인트 적용]
+    const url = `https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo212L01.do?authKey=${authKey}&returnType=XML&target=JOBCD&keyword=${encodeURIComponent(keyword)}&display=20`;
+    
+    const response = await axios.get(url);
+    const parser = new XMLParser();
+    const jsonObj = parser.parse(response.data);
 
-    // 워크넷 API는 결과가 없을 때나 에러일 때도 200을 줄 수 있으므로 응답 구조 확인 필요
-    // 보통 response.data.jobSrch에 리스트가 들어옴
-    const jobs = response.data?.jobSrch || [];
+    const jobs = jsonObj.jobsList?.jobList || jsonObj.jobsList?.item || [];
 
     res.json({
       success: true,
@@ -63,17 +58,14 @@ const searchDepartments = async (req, res) => {
         return res.status(500).json({ error: 'API 인증키가 설정되지 않았습니다.' });
       }
   
-      const response = await axios.get('http://openapi.work.go.kr/opi/opi/opia/univSrch.do', {
-        params: {
-          authKey: authKey,
-          returnType: 'json',
-          srchType: 'univNm', // 학교명 또는 학과명 검색 (API 사양에 따라 조정 필요)
-          keyword: keyword,
-          display: 10
-        }
-      });
+      // [고용24 최신 통합 API 엔드포인트 적용]
+      const url = `https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo212L01.do?authKey=${authKey}&returnType=XML&target=UNIV_DEPT_LIST&srchType=deptNm&keyword=${encodeURIComponent(keyword)}&display=20`;
+      
+      const response = await axios.get(url);
+      const parser = new XMLParser();
+      const jsonObj = parser.parse(response.data);
   
-      const items = response.data?.univSrch || [];
+      const items = jsonObj.univDeptList?.item || jsonObj.univDeptList?.univDeptList || [];
   
       res.json({
         success: true,
