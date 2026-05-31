@@ -159,17 +159,32 @@ const ResumeForm = ({
     } catch (e) {}
   };
 
+  // [v1.8.2] 검색 디바운싱(Debounce) 로직 추가
+  const [debounceTimer, setDebounceTimer] = useState(null);
+
   const searchMajor = async (keyword) => {
-    if (!keyword || keyword.length < 2) return;
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/resume/search-worknet-dept?keyword=${encodeURIComponent(keyword)}`);
-      const data = await response.json();
-      console.log("🔍 Major Search API Received:", data);
-      setMajorResults(data.univSrch || []);
-      setShowMajorList(true);
-    } catch (e) {
-      console.error("Major Search Error:", e);
+    if (!keyword || keyword.length < 2) {
+      setMajorResults([]);
+      return;
     }
+
+    // 기존 타이머가 있으면 취소
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    // 0.4초 뒤에 실제 API 호출
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/resume/search-worknet-dept?keyword=${encodeURIComponent(keyword)}`);
+        const data = await response.json();
+        console.log("🔍 Major Search API Received:", data);
+        setMajorResults(data.univSrch || []);
+        setShowMajorList(true);
+      } catch (e) {
+        console.error("Major Search Error:", e);
+      }
+    }, 400);
+
+    setDebounceTimer(timer);
   };
 
   const searchJob = async (keyword) => {
