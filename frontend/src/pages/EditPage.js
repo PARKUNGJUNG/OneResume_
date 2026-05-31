@@ -169,17 +169,21 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
     if (!isMobile) return;
 
     const handleScroll = (e) => {
+      // 캡처 단계에서 모든 스크롤을 감시하되, custom-scrollbar 클래스를 가진 요소만 처리
+      if (!e.target.classList?.contains('custom-scrollbar')) return;
+
       const currentScroll = e.target.scrollTop;
       const delta = currentScroll - lastScrollTop.current;
       
-      // 최상단 근처이거나 위로 스크롤 중이면 무조건 보여줌
-      if (currentScroll < 50 || delta < -5) {
+      // 최상단 근처(80px)이거나 위로 스크롤 중이면 무조건 보여줌
+      if (currentScroll < 80 || delta < -10) {
         setShowBottomBar(true);
         scrollAccumulator.current = 0;
-      } else if (delta > 5) {
+      } else if (delta > 10) {
         // 스크롤 내리는 중 (숨기기)
         scrollAccumulator.current += delta;
-        if (scrollAccumulator.current > 100) {
+        // 80px 이상 스크롤이 누적되면 숨김
+        if (scrollAccumulator.current > 80) {
           setShowBottomBar(false);
         }
       }
@@ -187,18 +191,20 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
       lastScrollTop.current = currentScroll;
     };
 
-    // 편집/미리보기 컨테이너 모두 감시
-    const containers = document.querySelectorAll('.custom-scrollbar');
-    containers.forEach(container => {
-      container.addEventListener('scroll', handleScroll, { passive: true });
-    });
+    // 뷰 전환 시 상태 초기화
+    scrollAccumulator.current = 0;
+    lastScrollTop.current = 0;
+    setShowBottomBar(true);
+
+    // window 레벨에서 캡처 모드로 리스닝 (가장 확실한 방법)
+    window.addEventListener('scroll', handleScroll, true);
     
     return () => {
-      containers.forEach(container => container.removeEventListener('scroll', handleScroll));
+      window.removeEventListener('scroll', handleScroll, true);
     };
   }, [isMobile, activeView]);
 
-  if (loading) return <PageLayout isDarkMode={isDarkMode}><div className="h-full flex items-center justify-center animate-pulse text-slate-500 font-bold text-xl">데이터 로딩 중...</div></PageLayout>;
+  if (loading) return <PageLayout isDarkMode={isDarkMode} allowScroll={false}><div className="h-full flex items-center justify-center animate-pulse text-slate-500 font-bold text-xl">데이터 로딩 중...</div></PageLayout>;
 
   const getScale = () => {
     const a4HeightPx = 1122.52;
@@ -307,7 +313,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                   {isMenuOpen && createPortal(
                     <div
                       onMouseDown={(e) => e.stopPropagation()}
-                      style={{ top: 'calc(var(--total-header-height) + 4px)' }}
+                      style={{ top: `calc(var(--total-header-height) + ${isMobile ? '12px' : '6px'})` }}
                       className={`fixed right-3 sm:right-6 lg:right-10 w-56 sm:w-64 lg:w-72 max-w-[calc(100vw-24px)] p-1 rounded-2xl border shadow-2xl animate-in fade-in zoom-in-95 duration-200 z-[9999] origin-top-right print:hidden ${
                       isDarkMode ? 'bg-zinc-900 border-zinc-700 shadow-black/50' : 'bg-white border-zinc-100 shadow-zinc-200/50'
                     }`}>
@@ -376,10 +382,10 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
             </div>
           </header>
 
-          <main className="h-[calc(100vh-56px)] flex overflow-hidden w-full relative print:hidden">
+          <main className="h-[calc(100vh-var(--total-header-height))] flex overflow-hidden w-full relative print:hidden">
             {( !isMobile || activeView === 'edit') && (
               <div style={{ width: isMobile ? '100%' : `${effectiveLeftWidth}%` }} className={`h-full overflow-y-auto custom-scrollbar relative ${transitionClass} ${!isMobile ? 'border-r' : ''} ${isDarkMode ? 'bg-zinc-950 border-zinc-900 lg:bg-[#09090b]' : 'bg-zinc-50 border-zinc-200'}`}>
-                <div className={`w-full relative origin-top-left min-h-full ${isDarkMode ? 'bg-zinc-950 lg:bg-transparent' : 'bg-zinc-50'}`} style={{ zoom: activeZoom, padding: isMobile ? '0 0 120px 0' : '24px' }}>
+                <div className={`w-full relative origin-top-left min-h-full ${isDarkMode ? 'bg-zinc-950 lg:bg-transparent' : 'bg-zinc-50'}`} style={{ zoom: activeZoom, padding: isMobile ? '0 0 140px 0' : '24px' }}>
                   <ResumeForm formData={formData} handleChange={handleChange} handleProjectChange={handleProjectChange} addProject={addProject} removeProject={removeProject} handleWorkChange={handleWorkChange} addWork={addWork} removeWork={removeWork} handleCertChange={handleCertChange} addCert={addCert} removeCert={removeCert} handleSubmit={handleSubmit} handleGithubSync={handleGithubSync} handleDragEnd={handleDragEndWithState} onDragStart={handleDragStart} handleImageUpload={handleImageUpload} auditContent={auditContent} isDarkMode={isDarkMode} paneWidth={leftPanePixelWidth} />
                 </div>
               </div>

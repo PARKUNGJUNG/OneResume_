@@ -1,9 +1,11 @@
 import React from 'react';
 import ThemeToggle from './ThemeToggle';
 
-const PageLayout = ({ children, isDarkMode, toggleDarkMode, noPadding = false }) => {
+const PageLayout = ({ children, isDarkMode, toggleDarkMode, noPadding = false, allowScroll = true }) => {
   return (
-    <div className={`relative min-h-screen w-full flex flex-col transition-colors duration-300 overflow-x-hidden overflow-y-auto ${
+    <div className={`relative min-h-screen w-full flex flex-col transition-colors duration-300 overflow-x-hidden ${
+      allowScroll ? 'overflow-y-auto' : 'overflow-y-hidden'
+    } ${
       isDarkMode ? 'bg-zinc-950' : 'bg-zinc-50'
     }`}>
       {/* 장식용 배경 원형 */}
