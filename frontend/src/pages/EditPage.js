@@ -243,7 +243,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
         <PageLayout isDarkMode={isDarkMode} noPadding={true}>
           <header 
             style={{ paddingTop: 'var(--safe-area-top)' }}
-            className={`sticky top-0 h-auto min-h-[56px] px-3 md:px-6 border-b flex items-center justify-between z-50 backdrop-blur-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/90 border-zinc-800 shadow-lg shadow-black/20' : 'bg-white/90 border-zinc-200 shadow-sm'}`}
+            className={`sticky top-0 h-auto min-h-[56px] pb-1.5 md:pb-0 px-3 md:px-6 border-b flex items-center justify-between z-50 backdrop-blur-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/90 border-zinc-800 shadow-lg shadow-black/20' : 'bg-white/90 border-zinc-200 shadow-sm'}`}
           >
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0 mr-2">
               <div className="flex items-center gap-1.5 md:gap-2.5 flex-shrink-0">
@@ -313,7 +313,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                   {isMenuOpen && createPortal(
                     <div
                       onMouseDown={(e) => e.stopPropagation()}
-                      style={{ top: `calc(var(--total-header-height) + ${isMobile ? '12px' : '6px'})` }}
+                      style={{ top: `calc(var(--total-header-height) + ${isMobile ? '4px' : '6px'})` }}
                       className={`fixed right-3 sm:right-6 lg:right-10 w-56 sm:w-64 lg:w-72 max-w-[calc(100vw-24px)] p-1 rounded-2xl border shadow-2xl animate-in fade-in zoom-in-95 duration-200 z-[9999] origin-top-right print:hidden ${
                       isDarkMode ? 'bg-zinc-900 border-zinc-700 shadow-black/50' : 'bg-white border-zinc-100 shadow-zinc-200/50'
                     }`}>
