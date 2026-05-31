@@ -131,10 +131,16 @@ exports.searchWorknetDept = async (req, res) => {
         const fallbackRes = await axios.get(fallbackUrl, { timeout: 5000 });
         const careerData = fallbackRes.data?.dataSearch?.content || [];
         
-        const normalized = careerData.map(item => ({
-            majorName: item.majorName || "",
-            detailName: item.facilName || ""
-        }));
+        const normalized = careerData.map(item => {
+            // 커리어넷은 majorName보다 facilName에 더 구체적인 이름이 오는 경우가 많음
+            const mainName = item.majorName || item.facilName || item.majorNm || "이름 정보 없음";
+            const subName = (mainName === item.facilName) ? (item.majorName || "") : (item.facilName || "");
+            
+            return {
+                majorName: mainName,
+                detailName: subName || item.mClass || ""
+            };
+        });
 
         console.log(`✅ Sending ${normalized.length} normalized CareerNet items`);
         res.status(200).json({ univSrch: normalized });
