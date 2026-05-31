@@ -18,7 +18,10 @@ const PageLayout = ({ children, isDarkMode, toggleDarkMode, noPadding = false, a
 
       {/* 우측 상단 테마 토글 버튼 (전역 적용) */}
       {toggleDarkMode && (
-        <div className="fixed top-6 right-6 z-[100] print:hidden">
+        <div 
+          style={{ top: 'calc(var(--safe-area-top) + 1.5rem)' }}
+          className="fixed right-6 z-[100] print:hidden"
+        >
           <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         </div>
       )}

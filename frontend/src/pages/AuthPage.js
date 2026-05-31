@@ -90,7 +90,7 @@ function AuthPage({ isDarkMode, toggleDarkMode }) {
             <p className="text-lg font-bold text-blue-600">oneresume.dev@gmail.com</p>
           </div>
           <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-blue-600/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'}`}>
-            <p className="text-sm font-medium mb-1 text-blue-600 opacity-80 font-bold">개발자 직통 문의 (빠른 답변)</p>
+            <p className="text-sm mb-1 text-blue-600 opacity-80 font-bold">개발자 직통 문의 (빠른 답변)</p>
             <p className="text-lg font-bold text-blue-600">parkjeongung0705@gmail.com</p>
           </div>
         </div>
