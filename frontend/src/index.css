@@ -158,7 +158,7 @@ html, body {
 
   body > div:last-child > div,
   #toaster {
-    top: calc(var(--safe-area-top) + 80px) !important;
+    top: calc(var(--safe-area-top) + 110px) !important;
     bottom: auto !important;
   }
 
