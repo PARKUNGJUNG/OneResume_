@@ -5,6 +5,7 @@
 /* --- Global App Styles --- */
 html, body {
   background-color: #f9f9fb; /* zinc-50 */
+  -webkit-text-size-adjust: 100%;
   transition: 
     background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1), 
     color 1.2s cubic-bezier(0.4, 0, 0.2, 1),
@@ -137,6 +138,11 @@ html, body {
 
 /* 2. 모바일/태블릿 스타일 (스마트폰 시스템 알림 극소화) */
 @media (max-width: 768px) {
+  /* iOS Safari 입력창 포커스 시 자동 확대 방지 (폰트 16px 미만일 때 발생) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
   body > div:last-child > div,
   #toaster {
     top: 12px !important;
