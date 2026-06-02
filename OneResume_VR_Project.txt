@@ -1,0 +1,30 @@
+# 🎮 OneResume VR Interview Simulator Project Plan
+
+## 📌 개요
+- **시작 예정일:** 2026-06-06
+- **목적:** 가상증강현실 강의 최종 과제 제출 및 OneResume IP 확장
+- **목표:** AI 기반의 실감형 모의 면접 환경 구축을 통한 취업 역량 강화
+
+## 🛠️ 기술 스택 및 비용 전략
+- **Engine:** Unity 3D (C#)
+- **Toolkit:** XR Interaction Toolkit (VR 특화)
+- **AI:** Google Gemini API (Free Tier - 쿼터 폴백 로직 적용)
+- **Assets:** 
+  - 캐릭터: Mixamo (무료 정장 아바타 및 애니메이션)
+  - 배경: Unity Asset Store (무료 Office/Meeting Room 에셋)
+- **비용:** 총 0원
+
+## 🎯 핵심 기능 (강의 요구사항 100% 반영)
+1. **Teleportation (이동):** 
+   - 사용자는 대기실에서 면접실 의자까지 텔레포트 앵커를 사용하여 이동함.
+2. **XR Grab (상호작용):** 
+   - 탁자 위 'OneResume 포트폴리오' 책자를 손으로 잡아 면접관 앞 소켓(Socket)에 올려두면 면접 세션이 시작됨.
+3. **Raycast Interaction (선택):** 
+   - 면접관의 질문에 대해 허공에 뜬 3D UI 패널을 손에서 나가는 레이저로 쏘아 답변 키워드를 선택함.
+
+## 📝 개발 단계 (Milestones)
+- **1단계 (6/6):** 프로젝트 폴더 생성 및 XR 툴킷 환경 설정, 무료 배경 에셋 배치.
+- **2단계 (6/7):** Mixamo 캐릭터 임포트 및 Animator(앉아있기, 말하기) 세팅.
+- **3단계 (6/8):** 텔레포트 및 이력서 Grab/Socket 인터랙션 C# 구현.
+- **4단계 (6/9):** Gemini API 연동하여 자소서 기반 면접 질문 생성 로직 구축.
+- **5단계 (6/10):** 최종 빌드 및 퀘스트 기기 테스트, 시연 영상 촬영.
