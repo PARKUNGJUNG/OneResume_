@@ -6,6 +6,9 @@ const s3 = require('../config/s3');
 
 const parser = new XMLParser();
 
+// VR 기기 핀코드 임시 저장소 (Key: 6자리 핀코드, Value: { resumeText, job })
+const pinCodeStore = new Map();
+
 // 커리어넷/워크넷 API 키 (환경 변수에서 로드)
 const CAREERNET_API_KEY = process.env.CAREERNET_API_KEY;
 // 서비스별 전용 키 매핑 (워크넷은 서비스마다 키가 다름)
@@ -483,5 +486,142 @@ exports.saveResume = async (req, res) => {
             });
         }
         res.status(500).json({ message: "서버 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요." });
+    }
+};
+
+// [VR 연동] 6자리 핀코드 발급 API (POST /api/resume/pin)
+exports.generatePinCode = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // 1. 유저와 이력서 정보 조회
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                resumes: {
+                    take: 1,
+                    orderBy: { updatedAt: 'desc' },
+                    include: {
+                        projects: true,
+                        workExperiences: true,
+                        certifications: true
+                    }
+                }
+            }
+        });
+
+        if (!user || !user.resumes || user.resumes.length === 0) {
+            return res.status(404).json({ message: "연동할 이력서가 존재하지 않습니다. 먼저 이력서를 저장해주세요." });
+        }
+
+        const resume = user.resumes[0];
+
+        // 2. 이력서 텍스트 빌드 (Gemini AI가 이력서를 이해하기 쉽도록 구조화된 한국어 텍스트로 합침)
+        let resumeText = `지원 직무: ${user.job || resume.title || '일반 지원자'}\n`;
+        resumeText += `이름: ${user.username || '지원자'}\n`;
+        if (user.bio) resumeText += `한줄 소개: ${user.bio}\n`;
+        if (resume.skills) resumeText += `기술 스택: ${resume.skills}\n`;
+        if (resume.education) resumeText += `학력: ${resume.education}\n`;
+
+        if (resume.workExperiences && resume.workExperiences.length > 0) {
+            resumeText += `\n[경력 사항]\n`;
+            resume.workExperiences.forEach(w => {
+                resumeText += `- 회사명: ${w.companyName}, 부서: ${w.department || ''}, 역할: ${w.role || ''}, 상세 직무: ${w.jobDescription || ''}, 근무 기간: ${w.period || ''}\n`;
+            });
+        }
+
+        if (resume.projects && resume.projects.length > 0) {
+            resumeText += `\n[프로젝트 경험]\n`;
+            resume.projects.forEach(p => {
+                resumeText += `- 프로젝트명: ${p.name}, 설명: ${p.description || ''}, 개발 스택: ${p.techStack || ''}, 담당 역할: ${p.role || ''}, 진행 기간: ${p.period || ''}\n`;
+            });
+        }
+
+        if (resume.selfIntroGrowth || resume.selfIntroCharacter || resume.selfIntroMotivation) {
+            resumeText += `\n[자기소개서]\n`;
+            if (resume.selfIntroGrowth) resumeText += `- 성장 과정: ${resume.selfIntroGrowth}\n`;
+            if (resume.selfIntroCharacter) resumeText += `- 성격의 장단점: ${resume.selfIntroCharacter}\n`;
+            if (resume.selfIntroMotivation) resumeText += `- 지원 동기 및 포부: ${resume.selfIntroMotivation}\n`;
+        }
+
+        // 3. 6자리 중복되지 않는 난수 핀코드 생성
+        let pinCode;
+        let attempts = 0;
+        do {
+            pinCode = Math.floor(100000 + Math.random() * 900000).toString();
+            attempts++;
+            if (attempts > 15) break; 
+        } while (pinCodeStore.has(pinCode));
+
+        // 4. 메모리 저장소에 등록
+        const jobTitle = user.job || resume.title || "지원자";
+        pinCodeStore.set(pinCode, {
+            resumeText: resumeText,
+            job: jobTitle
+        });
+
+        // 3분(180,000ms) 만료 타이머 등록
+        setTimeout(() => {
+            if (pinCodeStore.has(pinCode)) {
+                pinCodeStore.delete(pinCode);
+                console.log(`⏰ [PinCode Expired] 핀코드가 만료되어 자동으로 삭제되었습니다: ${pinCode}`);
+            }
+        }, 180000);
+
+        console.log(`🔑 [PinCode Generated] 발급 완료: ${pinCode} (직무: ${jobTitle}, 만료: 3분)`);
+        
+        return res.status(200).json({
+            success: true,
+            pinCode: pinCode,
+            expiresIn: 180 // 180초
+        });
+
+    } catch (error) {
+        console.error("❌ 핀코드 생성 에러:", error);
+        return res.status(500).json({ message: "핀코드 생성 중 서버 오류가 발생했습니다." });
+    }
+};
+
+// [VR 연동] 6자리 핀코드 검증 및 이력서 반환 API (GET /api/resume/pin)
+exports.getResumeByPinCode = async (req, res) => {
+    try {
+        const { code } = req.query;
+
+        if (!code) {
+            return res.status(400).json({
+                success: false,
+                message: "code 쿼리 파라미터가 누락되었습니다."
+            });
+        }
+
+        // 핀코드 데이터 가져오기
+        const data = pinCodeStore.get(code);
+
+        if (data) {
+            console.log(`✅ [PinCode Verified] 핀코드 인증 성공: ${code} (직무: ${data.job})`);
+            
+            // 일회용 코드이므로 즉시 폐기
+            pinCodeStore.delete(code);
+            
+            return res.status(200).json({
+                success: true,
+                message: "인증에 성공했습니다.",
+                job: data.job,
+                resumeText: data.resumeText
+            });
+        } else {
+            console.log(`❌ [PinCode Verification Failed] 만료되었거나 존재하지 않는 핀코드: ${code}`);
+            return res.status(404).json({
+                success: false,
+                message: "만료되었거나 존재하지 않는 6자리 핀코드입니다."
+            });
+        }
+
+    } catch (error) {
+        console.error("❌ 핀코드 검증 에러:", error);
+        return res.status(500).json({
+            success: false,
+            message: "서버 처리 중 오류가 발생했습니다."
+        });
     }
 };

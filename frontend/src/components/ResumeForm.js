@@ -853,7 +853,29 @@ const ResumeForm = ({
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
           <div className={`relative w-full max-w-lg rounded-2xl md:rounded-[32px] overflow-hidden shadow-2xl ${isDarkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-white'}`}>
             <div className="flex items-center justify-between p-5 md:p-6 border-b border-zinc-700/10"><h3 className={`font-black text-lg ${isDarkMode ? 'text-white' : 'text-zinc-800'}`}>주소 검색</h3><button onClick={() => setIsAddressOpen(false)} className={`w-8 h-8 flex items-center justify-center rounded-full transition-all text-xl ${isDarkMode ? 'text-white/60 hover:text-white hover:bg-zinc-800' : 'text-zinc-500 hover:text-zinc-800 hover:bg-gray-100'}`}>✕</button></div>
-            <div className="p-2"><DaumPostcode onComplete={(data) => { handleChange({ target: { name: "address", value: data.address } }); setIsAddressOpen(false); }} style={{ height: '450px' }} theme={isDarkMode ? { bgColor: "#18181b", searchBgColor: "#18181b", contentBgColor: "#18181b", pageBgColor: "#18181b", textColor: "#ffffff", queryTextColor: "#ffffff", postcodeTextColor: "#3b82f6", emphasizeTextColor: "#60a5fa", outlineColor: "#3f3f46" } : null} /></div>
+            <div className="p-2">
+              <DaumPostcode 
+                onComplete={(data) => { 
+                  let fullAddress = data.address;
+                  let extraAddress = "";
+                  
+                  if (data.addressType === "R") {
+                    if (data.bname !== "") {
+                      extraAddress += data.bname;
+                    }
+                    if (data.buildingName !== "") {
+                      extraAddress += (extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName);
+                    }
+                    fullAddress += (extraAddress !== "" ? ` (${extraAddress})` : "");
+                  }
+
+                  handleChange({ target: { name: "address", value: fullAddress } }); 
+                  setIsAddressOpen(false); 
+                }} 
+                style={{ height: '450px' }} 
+                theme={isDarkMode ? { bgColor: "#18181b", searchBgColor: "#18181b", contentBgColor: "#18181b", pageBgColor: "#18181b", textColor: "#ffffff", queryTextColor: "#ffffff", postcodeTextColor: "#3b82f6", emphasizeTextColor: "#60a5fa", outlineColor: "#3f3f46" } : null} 
+              />
+            </div>
           </div>
         </div>
       )}

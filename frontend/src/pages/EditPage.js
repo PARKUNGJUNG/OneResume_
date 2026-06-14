@@ -10,6 +10,7 @@ import PageLayout from "../components/PageLayout";
 import ThemeToggle from "../components/ThemeToggle";
 import JDMatchModal from "../components/JDMatchModal";
 import ConnectModal from "../components/ConnectModal";
+import VRConnectModal from "../components/VRConnectModal";
 import logo from "../logo.svg";
 
 function EditPage({ isDarkMode, toggleDarkMode }) {
@@ -23,6 +24,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
   const [totalPages, setTotalPages] = useState(1);
   const [isJDModalOpen, setIsJDModalOpen] = useState(false);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isVRModalOpen, setIsVRModalOpen] = useState(false);
   const [isExtensionInstalled, setIsExtensionInstalled] = useState(false);
   const [isLayoutOpen, setIsLayoutOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -280,6 +282,9 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                 )}
                 <div className={`hidden lg:flex items-center transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden ${isHeaderCollapsed ? 'max-w-0 opacity-0 pointer-events-none -ml-2 md:-ml-3' : 'max-w-[1000px] opacity-100'}`}>
                   <div className="flex items-center gap-2 md:gap-3">
+                    <button onClick={() => setIsVRModalOpen(true)} className="bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-black px-4 h-9 rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 border-2 border-fuchsia-500/20 shadow-lg shadow-fuchsia-600/20 transition-all active:scale-95 flex-shrink-0">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4 flex-shrink-0 fill-none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="7" width="20" height="10" rx="2" ry="2" /><path d="M12 17a3 3 0 0 1-3-3H6" /><path d="M12 17a3 3 0 0 0 3-3h3" /></svg>VR 면접 연동
+                    </button>
                     <button onClick={() => setIsConnectModalOpen(true)} className="bg-purple-600 hover:bg-purple-700 text-white font-black px-4 h-9 rounded-xl text-[10px] md:text-xs flex items-center gap-1.5 border-2 border-purple-500/20 shadow-lg shadow-purple-600/20 transition-all active:scale-95 flex-shrink-0">
                       <svg viewBox="0 0 24 24" className="h-4 w-4 flex-shrink-0 fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M13 10V3L4 14H11V21L20 10H13Z" /></svg>확장 프로그램 연동
                     </button>
@@ -356,6 +361,9 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
                             </button>
                           </div>
                           <>
+                            <button onClick={() => { setIsVRModalOpen(true); setIsMenuOpen(false); }} className={`w-full flex items-center gap-2.5 px-2 py-2 sm:px-3 sm:py-2.5 text-[11px] sm:text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-blue-600'}`}>
+                              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-fuchsia-500/10 flex items-center justify-center text-fuchsia-600 flex-shrink-0"><svg viewBox="0 0 24 24" className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 fill-none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="7" width="20" height="10" rx="2" ry="2" /><path d="M12 17a3 3 0 0 1-3-3H6" /><path d="M12 17a3 3 0 0 0 3-3h3" /></svg></div>VR 면접 연동
+                            </button>
                             <button onClick={() => { setIsConnectModalOpen(true); setIsMenuOpen(false); }} className={`w-full flex items-center gap-2.5 px-2 py-2 sm:px-3 sm:py-2.5 text-[11px] sm:text-xs font-black rounded-xl transition-all ${isDarkMode ? 'text-zinc-300 hover:bg-zinc-800/80 hover:text-white' : 'text-zinc-600 hover:bg-zinc-50 hover:text-blue-600'}`}>
                               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600 flex-shrink-0"><svg viewBox="0 0 24 24" className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 fill-current" xmlns="http://www.w3.org/2000/svg"><path d="M13 10V3L4 14H11V21L20 10H13Z" /></svg></div>확장 프로그램 연동
                             </button>
@@ -472,6 +480,7 @@ function EditPage({ isDarkMode, toggleDarkMode }) {
           )}
           <JDMatchModal isOpen={isJDModalOpen} onClose={() => setIsJDModalOpen(false)} isDarkMode={isDarkMode} />
           <ConnectModal isOpen={isConnectModalOpen} onClose={() => setIsConnectModalOpen(false)} isDarkMode={isDarkMode} isExtensionInstalled={isExtensionInstalled} />
+          <VRConnectModal isOpen={isVRModalOpen} onClose={() => setIsVRModalOpen(false)} isDarkMode={isDarkMode} />
         </PageLayout>
       </div>
 

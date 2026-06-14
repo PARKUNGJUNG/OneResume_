@@ -47,4 +47,10 @@ router.post('/save', authMiddleware, resumeController.saveResume);
 // [표준 JSON 데이터 내보내기]
 router.get('/export', authMiddleware, resumeController.exportResume);
 
+// [VR 연동 6자리 핀코드 발급]
+router.post('/pin', authMiddleware, resumeController.generatePinCode);
+
+// [VR 연동 6자리 핀코드 검증 및 조회]
+router.get('/pin', resumeController.getResumeByPinCode);
+
 module.exports = router;
