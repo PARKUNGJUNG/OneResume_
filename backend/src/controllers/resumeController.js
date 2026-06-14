@@ -557,7 +557,8 @@ exports.generatePinCode = async (req, res) => {
         const jobTitle = user.job || resume.title || "지원자";
         pinCodeStore.set(pinCode, {
             resumeText: resumeText,
-            job: jobTitle
+            job: jobTitle,
+            name: user.username || "지원자"
         });
 
         // 3분(180,000ms) 만료 타이머 등록
@@ -607,6 +608,7 @@ exports.getResumeByPinCode = async (req, res) => {
                 success: true,
                 message: "인증에 성공했습니다.",
                 job: data.job,
+                name: data.name,
                 resumeText: data.resumeText
             });
         } else {
